@@ -40,3 +40,27 @@ test("the manifest summarizes the build (RN-21)", () => {
   assert.equal(manifest.cards, fixtures.length);
   assert.ok(manifest.tagged > 0);
 });
+
+test("applies overrides by card name after the rules (gramática §3.8)", () => {
+  const result = buildCardData({
+    rawCards: fixtures,
+    commanderIds: new Set(),
+    rules,
+    overrides: [{ card: "Elvish Archdruid", remove: ["tribal"], add: [{ role: "draw", weight: 0.5 }], reason: "test override" }]
+  });
+  const archdruid = result.cards.find((card) => card.name === "Elvish Archdruid")!;
+  assert.equal(archdruid.themes.some((tag) => tag.theme.startsWith("tribal")), false);
+  assert.ok(archdruid.roles.some((tag) => tag.role === "draw" && tag.ruleIds.includes("override")));
+  assert.equal(result.overridesApplied, 1);
+});
+
+test("reports overrides that name no card, instead of ignoring them", () => {
+  const result = buildCardData({
+    rawCards: fixtures,
+    commanderIds: new Set(),
+    rules,
+    overrides: [{ card: "Elvish Archdruidd", remove: ["tribal"], reason: "typo in the name" }]
+  });
+  assert.deepEqual(result.unknownOverrideCards, ["Elvish Archdruidd"]);
+  assert.equal(result.overridesApplied, 0);
+});
