@@ -47,3 +47,8 @@ limits:
   weak_score: 40              # RN-60
   gap_min_cards: 15           # RN-61
   small_pool: 30              # RN-62
+
+import:                       # RN-13 · name resolution when importing a pool
+  fuzzy_max_distance: 2       # "Lightinng Bolt" is 1 edit away; at 3 typos start landing on other cards
+  fuzzy_max_ratio: 0.25       # 4–7 letters allow 1 edit, 8+ allow 2, "Opt" allows none
+  max_suggestions: 5          # candidates shown for an ambiguous line
