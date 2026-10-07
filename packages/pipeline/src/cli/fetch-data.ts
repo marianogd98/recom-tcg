@@ -16,13 +16,13 @@ async function main(): Promise<void> {
   const store = new RawDataStore(repoPaths(import.meta.dirname).rawData);
 
   const bulk = await scryfall.oracleBulkFile();
-  console.log(`Downloading oracle_cards (${bulk.updatedAt})…`);
-  store.saveOracleCards(await scryfall.download(bulk.downloadUri));
+  console.log(`Downloading oracle_cards (${bulk.format}, ${bulk.updatedAt})…`);
+  store.saveOracleCards(await scryfall.download(bulk.downloadUri), bulk.format);
 
   console.log("Fetching is:commander…");
   const commanderIds = await scryfall.searchOracleIds("is:commander");
   store.saveCommanderIds(commanderIds);
-  store.saveUpdatedAt(bulk.updatedAt);
+  store.saveMeta({ updatedAt: bulk.updatedAt, format: bulk.format });
 
   console.log(`✓ ${commanderIds.length} commander-eligible cards · data ${bulk.updatedAt}`);
 }
