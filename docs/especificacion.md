@@ -719,5 +719,5 @@ La verificación hipergeométrica (RN-45) se reserva para la v1.1 porque necesit
 - Contrastar la fórmula de tierras (RN-44) con análisis publicados.
 - Revisar la Fan Content Policy de Wizards of the Coast antes del lanzamiento público.
 - Revisar las condiciones de uso de imágenes y simbología de Scryfall (atribución, no alterar imágenes).
-- Elegir licencia: MIT (máxima libertad de uso) o AGPL (obliga a publicar cambios si se ofrece como servicio).
+- ~~Elegir licencia~~ — decidido: MIT.
 - ~~Definir el stack tecnológico y la interfaz~~ — decidido: monorepo TypeScript con Next.js (exportación estática).

@@ -2,6 +2,7 @@
   "name": "@recom-tcg/engine",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "description": "Pure TypeScript scoring engine: pool normalization, candidates, metrics and evidence. No DOM, no network.",
   "type": "module",
   "exports": {

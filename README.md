@@ -63,7 +63,7 @@ The easiest way to help is improving the **detection rules** in `rules/`: no pro
 
 ## License
 
-To be decided before the first public release (MIT or AGPL-3.0).
+[MIT](LICENSE). The license covers this project's code and docs, not Magic: The Gathering content or Scryfall data.
 
 ---
 

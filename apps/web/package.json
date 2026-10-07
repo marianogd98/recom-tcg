@@ -2,6 +2,7 @@
   "name": "@recom-tcg/web",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "description": "ReCom TCG web app: Next.js static export. All scoring runs in the browser (RN-20).",
   "scripts": {
     "dev": "next dev",

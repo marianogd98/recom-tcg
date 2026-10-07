@@ -36,6 +36,10 @@ pnpm data:build       # genera los datos etiquetados en data/out/
 
 La estructura del repositorio, la hoja de ruta y la guía de contribución están en el [README en inglés](README.md) y en [CONTRIBUTING.md](CONTRIBUTING.md). Las contribuciones en español son bienvenidas.
 
+## Licencia
+
+[MIT](LICENSE). Cubre el código y la documentación del proyecto, no el contenido de Magic: The Gathering ni los datos de Scryfall.
+
 ---
 
 ReCom TCG es contenido de fans no oficial permitido bajo la Fan Content Policy de Wizards of the Coast. No está aprobado ni respaldado por Wizards. Parte de los materiales usados son propiedad de Wizards of the Coast. © Wizards of the Coast LLC. Datos de cartas provistos por [Scryfall](https://scryfall.com).
