@@ -1,9 +1,20 @@
-import { cosineInt8, isSubsetOf, normalize, quantiles, quantize, QUANTILE_LEVELS, type Color } from "@recom-tcg/engine";
+import {
+  cosineInt8,
+  isSubsetOf,
+  normalize,
+  quantiles,
+  quantize,
+  QUANTILE_LEVELS,
+  type Color,
+  type EmbeddingHeader
+} from "@recom-tcg/engine";
 import type { Embedder } from "./embedder.ts";
 import { fitPca, project } from "./pca.ts";
 
 /** One card as the embedding step needs it. */
 export interface EmbeddingCard {
+  /** Position of the card in cards.json; the browser joins vectors to cards through it. */
+  cardIndex: number;
   oracleId: string;
   text: string;
   colorIdentity: Color[];
@@ -17,18 +28,15 @@ export interface EmbeddingSettings {
   calibrationSample: number;
 }
 
-/** Describes embeddings.bin so the browser can read it (RN-21). */
-export interface EmbeddingHeader {
-  model: string;
-  dimensions: number;
-  quantization: "int8";
-  oracleIds: string[];
-  quantileLevels: readonly number[];
+/** Which card data the vectors belong to, copied into the header (RN-21). */
+export interface CardDataVersion {
+  dataDate: string;
+  cardCount: number;
 }
 
 export interface EmbeddingArtifacts {
   header: EmbeddingHeader;
-  /** oracleIds.length × dimensions int8 values, row by row. */
+  /** cardIndexes.length × dimensions int8 values, row by row. */
   vectors: Int8Array;
   /** Per commander oracle id: quantiles of its similarity to cards of its identity (RN-26). */
   calibration: Record<string, number[]>;
@@ -49,6 +57,7 @@ export async function buildEmbeddings(
   cards: readonly EmbeddingCard[],
   embedder: Embedder,
   settings: EmbeddingSettings,
+  version: CardDataVersion,
   report: ProgressReporter = () => {}
 ): Promise<EmbeddingArtifacts> {
   const raw = await embedAll(cards, embedder, settings.batchSize, report);
@@ -65,7 +74,9 @@ export async function buildEmbeddings(
       model: embedder.modelId,
       dimensions: settings.dimensions,
       quantization: "int8",
-      oracleIds: cards.map((card) => card.oracleId),
+      dataDate: version.dataDate,
+      cardCount: version.cardCount,
+      cardIndexes: cards.map((card) => card.cardIndex),
       quantileLevels: QUANTILE_LEVELS
     },
     vectors,

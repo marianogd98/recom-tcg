@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Card } from "@recom-tcg/engine";
 import type { Manifest } from "../build/build-card-data.ts";
@@ -22,6 +22,20 @@ export class ArtifactStore {
     this.write("embeddings.bin", new Uint8Array(vectors.buffer, vectors.byteOffset, vectors.byteLength));
     this.write("embeddings.json", JSON.stringify(header));
     this.write("semantic-calibration.json", JSON.stringify(calibration));
+  }
+
+  /** Reads back what save() wrote; data:embed builds on it. */
+  loadCards(): { cards: Card[]; manifest: Manifest } {
+    return { cards: this.readJson<Card[]>("cards.json"), manifest: this.readJson<Manifest>("manifest.json") };
+  }
+
+  private readJson<T>(file: string): T {
+    const path = join(this.dir, file);
+    try {
+      return JSON.parse(readFileSync(path, "utf8")) as T;
+    } catch (error) {
+      throw new Error(`Cannot read ${path}. Did you run "pnpm data:build"? (${(error as Error).message})`);
+    }
   }
 
   private write(file: string, content: string | Uint8Array): void {

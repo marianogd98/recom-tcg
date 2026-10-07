@@ -80,7 +80,11 @@ flowchart LR
 4. **`vector.ts`** (engine): cuantiza a int8. El archivo pasa de ~45 MB a ~4 MB.
 5. **`calibration.ts`** (engine): una similitud de 0,45 puede ser altísima para un comandante y mediocre para otro. Por eso, para cada comandante se guarda la distribución de su similitud contra las cartas que podría jugar, y en el navegador la similitud cruda se convierte en percentil (RN-26).
 
-Las funciones de `vector.ts` y `calibration.ts` viven en el engine porque se usan en los dos lados: en el build para generar los datos y en el navegador para leerlos. Así ambos lados siempre calculan igual.
+Solo se calculan vectores para el **pool de Commander** (cartas legales y prohibidas): unas 32 mil de las ~35 mil de `cards.json`. Las cartas de colecciones «Un», Alchemy o memorabilia siguen en `cards.json`, para que la importación pueda reconocerlas y reportarlas (RN-19), pero no compiten en el ranking y no necesitan vector.
+
+`embeddings.bin` no repite los identificadores de las cartas: `embeddings.json` guarda, para cada fila, su posición en `cards.json` (`cardIndexes`). `openEmbeddingTable()` une ambos archivos y se niega a hacerlo si vienen de builds distintos, porque eso pegaría vectores a cartas equivocadas sin avisar. Por eso `data:embed` se ejecuta siempre después de `data:build`.
+
+Las funciones de `vector.ts`, `calibration.ts` y `artifacts.ts` viven en el engine porque se usan en los dos lados: en el build para generar los datos y en el navegador para leerlos. Así ambos lados siempre calculan igual.
 
 ## 5. SOLID en este proyecto
 
