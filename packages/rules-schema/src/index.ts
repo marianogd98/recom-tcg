@@ -3,6 +3,26 @@ import { parse } from "yaml";
 
 export type Provides = "asks" | "gives";
 
+/** One side of a pair variant in rules/formats/<format>/pairing.yaml (RN-04). */
+export interface PairingSide {
+  text_line?: string;
+  text_pattern?: string;
+  type_all?: string[];
+  own_name?: true;
+  solo?: false;
+}
+
+export interface PairingDefinition {
+  id: string;
+  a: PairingSide;
+  b: PairingSide;
+}
+
+export interface PairingFile {
+  schema_version: 1;
+  pairings: PairingDefinition[];
+}
+
 /** A rule as written in rules/themes/*.yaml or rules/roles/*.yaml (gramática YAML §3.4). */
 export interface RuleDefinition {
   id: string;

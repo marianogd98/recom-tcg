@@ -195,7 +195,7 @@ El campo reason es obligatorio y cada override se revisa en el pull request. Los
 
 #### RN-01 — Carta elegible como comandante
 
-Una carta del pool es candidata si Scryfall la considera apta para ser comandante (búsqueda is:commander, descargada en el build como lista de IDs) y su legalidad en Commander es legal. Esto cubre criaturas legendarias, planeswalkers y cartas que dicen «puede ser tu comandante».
+Una carta del pool es candidata si Scryfall la considera apta para ser comandante (búsqueda is:commander, descargada en el build como lista de IDs) y su legalidad en Commander es legal. Esto cubre criaturas legendarias, planeswalkers y cartas que dicen «puede ser tu comandante». Scryfall excluye de is:commander a las prohibidas, así que el build las añade con una segunda búsqueda para poder nombrarlas (RN-02).
 
 #### RN-02 — Comandantes prohibidos
 
@@ -207,27 +207,31 @@ Se usa el campo color_identity de Scryfall, que ya aplica las reglas oficiales (
 
 #### RN-04 — Comandantes en pareja
 
-Una pareja es un candidato único con identidad igual a la unión de ambos, evaluado con el mismo modelo. Solo se forman parejas entre cartas del pool. Las variantes se declaran en YAML y cada variante solo se combina consigo misma.
+Una pareja es un candidato único con identidad igual a la unión de ambos, evaluado con el mismo modelo. Solo se forman parejas entre cartas del pool. Las variantes se declaran en YAML y cada variante solo se combina consigo misma: dos cartas forman pareja cuando una cumple el lado `a`, la otra el lado `b` y ambas dan la misma clave.
+
+Los lados se comprueban sobre las líneas del texto Oracle, no sobre las palabras clave de Scryfall, que etiqueta todas las variantes como «Partner».
 
 ```
 # rules/formats/commander/pairing.yaml
 pairings:
-  - id: partner
-    a: { keyword: "Partner" }
-    b: { keyword: "Partner" }
-  - id: partner-with
-    a: { keyword_pattern: "Partner with (?<name>.+)" }
-    b: { name_equals: "{name}" }
-  - id: friends-forever
-    a: { keyword: "Friends forever" }
-    b: { keyword: "Friends forever" }
-  - id: choose-a-background
-    a: { keyword: "Choose a Background" }
-    b: { type_all: ["Legendary", "Enchantment", "Background"] }
+  - id: partner                 # solo «Partner» con «Partner»
+    a: { text_line: "Partner" }
+    b: { text_line: "Partner" }
+  - id: partner-with            # solo con la carta nombrada
+    a: { text_pattern: "^Partner with (?<key>.+)$" }
+    b: { own_name: true }
+  - id: partner-variant         # «Partner—Friends forever», «Partner—Survivors»…
+    a: { text_pattern: "^Partner—(?<key>.+)$" }
+    b: { text_pattern: "^Partner—(?<key>.+)$" }
+  - id: choose-a-background     # un Background no puede ser comandante solo
+    a: { text_line: "Choose a Background" }
+    b: { type_all: ["Legendary", "Enchantment", "Background"], solo: false }
   - id: doctors-companion
-    a: { keyword: "Doctor's companion" }
+    a: { text_line: "Doctor's companion" }
     b: { type_all: ["Legendary", "Creature", "Time Lord", "Doctor"] }
 ```
+
+*Contrastado en octubre de 2026 con los datos de Scryfall: «Friends forever» pasó a ser «Partner—Friends forever», y existen además «Survivors», «Father & son» y «Character select».*
 
 *Este archivo debe contrastarse con las reglas oficiales vigentes antes de publicarse.*
 
@@ -715,7 +719,7 @@ La verificación hipergeométrica (RN-45) se reserva para la v1.1 porque necesit
 ### 10.2 Pendientes
 
 - Calibrar los coeficientes v0 de model.yaml con la suite de pools de referencia.
-- Contrastar pairing.yaml con las reglas oficiales de Commander vigentes.
+- ~~Contrastar pairing.yaml con las reglas oficiales de Commander vigentes~~ — hecho en octubre de 2026 contra los datos de Scryfall (ver RN-04). Repetirlo cuando salga una variante nueva de pareja.
 - Contrastar la fórmula de tierras (RN-44) con análisis publicados.
 - Revisar la Fan Content Policy de Wizards of the Coast antes del lanzamiento público.
 - Revisar las condiciones de uso de imágenes y simbología de Scryfall (atribución, no alterar imágenes).

@@ -1,8 +1,9 @@
 import type { Card } from "@recom-tcg/engine";
-import type { OverrideDefinition } from "@recom-tcg/rules-schema";
+import type { OverrideDefinition, PairingDefinition } from "@recom-tcg/rules-schema";
 import { tagCard } from "../rules/apply.ts";
 import type { CompiledRule } from "../rules/compile.ts";
 import { applyOverride } from "../rules/overrides.ts";
+import { buildPairingTags } from "./pairing-tags.ts";
 import { toEngineCard, toRuleInput } from "../normalize.ts";
 import { NON_DECK_LAYOUTS, type ScryfallCard } from "../scryfall/types.ts";
 
@@ -12,6 +13,8 @@ export interface BuildInput {
   rules: CompiledRule[];
   /** From rules/overrides.yaml (gramática §3.8). */
   overrides?: OverrideDefinition[];
+  /** From rules/formats/commander/pairing.yaml (RN-04). */
+  pairings?: PairingDefinition[];
 }
 
 export interface BuildResult {
@@ -44,15 +47,21 @@ export interface Manifest {
  * The data build as a pure function: same input, same output, no files.
  * The CLI (cli/build-data.ts) only reads inputs and writes outputs around it.
  */
-export function buildCardData({ rawCards, commanderIds, rules, overrides = [] }: BuildInput): BuildResult {
+export function buildCardData({ rawCards, commanderIds, rules, overrides = [], pairings = [] }: BuildInput): BuildResult {
   const deckCards = rawCards.filter(isDeckCard);
   const overrideByCard = new Map(overrides.map((override) => [override.card, override]));
+  const pairingTags = buildPairingTags(deckCards, pairings);
 
   const cards = deckCards.map((raw) => {
     const input = toRuleInput(raw);
     const ruleTags = tagCard(input, rules);
     const override = overrideByCard.get(raw.name);
-    return { ...toEngineCard(raw, commanderIds, input), ...(override ? applyOverride(ruleTags, override) : ruleTags) };
+    const pairing = pairingTags.get(raw.oracle_id!);
+    return {
+      ...toEngineCard(raw, commanderIds, input),
+      ...(override ? applyOverride(ruleTags, override) : ruleTags),
+      ...(pairing ? { pairing } : {})
+    };
   });
 
   const names = new Set(deckCards.map((card) => card.name));

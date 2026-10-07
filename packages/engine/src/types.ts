@@ -41,7 +41,11 @@ export interface Card {
   keywords: string[];
   /** Commander legality (RN-19). */
   legality: "legal" | "banned" | "not_legal" | "restricted";
-  /** True when Scryfall's is:commander includes it (RN-01). */
+  /**
+   * Could lead a deck if the banlist allowed it: Scryfall's is:commander,
+   * plus the banned cards it leaves out (so RN-02 can name them). Candidates
+   * also need legality "legal" (RN-01).
+   */
   canBeCommander: boolean;
   /**
    * Copies a deck may hold (RN-16): 1 for almost every card, a number for
@@ -52,6 +56,24 @@ export interface Card {
   landValue: number;
   themes: ThemeTag[];
   roles: RoleTag[];
+  /** How this card can share command with another (RN-04). Absent for most cards. */
+  pairing?: PairingTag[];
+}
+
+/**
+ * One side of a pair variant from pairing.yaml that this card fulfils.
+ * Two cards pair when one has side "a" and the other side "b" of the same
+ * variant with the same key: "Partner with Krav" is { id: "partner-with",
+ * side: "a", key: "krav, the unredeemed" }, and Krav carries side "b" with
+ * that key.
+ */
+export interface PairingTag {
+  id: string;
+  side: "a" | "b";
+  /** Normalized; "" when the variant needs no key (plain Partner, Backgrounds). */
+  key: string;
+  /** false: this card can only be a commander inside such a pair (Backgrounds). */
+  solo?: false;
 }
 
 /** How many copies of a card a deck may hold. "any" cannot be a number: JSON has no Infinity. */

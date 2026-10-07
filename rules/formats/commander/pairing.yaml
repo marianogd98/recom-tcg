@@ -1,25 +1,45 @@
 # yaml-language-server: $schema=../../../packages/rules-schema/schemas/pairing.schema.json
-# Commander pair variants (RN-04). Each variant only pairs with itself.
-# TODO before publishing: check every entry against the current official Commander rules.
+# Commander pair variants (RN-04). Two cards form a pair when one matches
+# side `a`, the other side `b` of the same variant, and both give the same key.
+#
+# Sides are matched on the card's own lines of Oracle text (reminder text in
+# parentheses removed), NOT on Scryfall's keywords: Scryfall tags every
+# variant as plain "Partner", so "Partner with Krav" or "Partner—Survivors"
+# would otherwise pair with any partner.
+#
+#   text_line:    a line that says exactly this (without case)
+#   text_pattern: a line matching this regex; its (?<key>…) group is the key
+#   type_all:     the type line contains all these words
+#   own_name:     the key is the card's own name
+#   solo: false   cards matched by this side cannot be commander alone
+#
+# A side without text_pattern or own_name has the empty key "".
+# Checked against the Commander rules and the 2026 Scryfall data (702.124).
 schema_version: 1
 
 pairings:
+  # Plain "Partner" pairs only with plain "Partner".
   - id: partner
-    a: { keyword: "Partner" }
-    b: { keyword: "Partner" }
+    a: { text_line: "Partner" }
+    b: { text_line: "Partner" }
 
+  # "Partner with Regna, the Redeemer" pairs only with that card.
   - id: partner-with
-    a: { keyword_pattern: "Partner with (?<name>.+)" }
-    b: { name_equals: "{name}" }
+    a: { text_pattern: "^Partner with (?<key>.+)$" }
+    b: { own_name: true }
 
-  - id: friends-forever
-    a: { keyword: "Friends forever" }
-    b: { keyword: "Friends forever" }
+  # "Partner—Friends forever", "Partner—Survivors", "Partner—Father & son"…
+  # pair only with the same text after the dash. New variants need no change here.
+  - id: partner-variant
+    a: { text_pattern: "^Partner—(?<key>.+)$" }
+    b: { text_pattern: "^Partner—(?<key>.+)$" }
 
+  # Scryfall lists Backgrounds as commander-eligible, but one can only be a
+  # commander next to a "Choose a Background" creature.
   - id: choose-a-background
-    a: { keyword: "Choose a Background" }
-    b: { type_all: ["Legendary", "Enchantment", "Background"] }
+    a: { text_line: "Choose a Background" }
+    b: { type_all: ["Legendary", "Enchantment", "Background"], solo: false }
 
   - id: doctors-companion
-    a: { keyword: "Doctor's companion" }
+    a: { text_line: "Doctor's companion" }
     b: { type_all: ["Legendary", "Creature", "Time Lord", "Doctor"] }

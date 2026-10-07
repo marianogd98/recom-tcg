@@ -11,6 +11,7 @@ export const REPO_LAYOUT = {
   rules: "rules",
   vocabulary: "rules/vocabulary.yaml",
   overrides: "rules/overrides.yaml",
+  pairing: "rules/formats/commander/pairing.yaml",
   importProfiles: "import-profiles",
   rawData: "data/raw",
   outData: "data/out"
