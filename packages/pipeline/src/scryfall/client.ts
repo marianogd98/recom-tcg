@@ -8,6 +8,8 @@
  * `fetch` and `sleep` are injected (Dependency Inversion), so tests run the
  * real pagination logic against a fake server, instantly and offline.
  */
+import { inflateIfGzip, type BulkFormat } from "./bulk-file.ts";
+
 export type FetchFn = (url: string, init?: RequestInit) => Promise<Response>;
 
 export interface ScryfallClientOptions {
@@ -21,10 +23,22 @@ export interface ScryfallClientOptions {
 export interface BulkFileInfo {
   downloadUri: string;
   updatedAt: string;
+  format: BulkFormat;
+}
+
+/** A bulk item as Scryfall documents it. Fields are optional here because we validate them. */
+interface BulkItem {
+  type: string;
+  uri?: string;
+  /** Original JSON-array file. Scryfall stopped listing it in 2026. */
+  download_uri?: string;
+  /** Gzip-compressed JSON Lines file, one card per line. */
+  jsonl_download_uri?: string;
+  updated_at?: string;
 }
 
 interface BulkList {
-  data: { type: string; download_uri: string; updated_at: string }[];
+  data: BulkItem[];
 }
 
 interface SearchPage {
@@ -51,14 +65,26 @@ export class ScryfallClient {
   /** The "oracle_cards" bulk file: one entry per card, not per printing (RN-10). */
   async oracleBulkFile(): Promise<BulkFileInfo> {
     const list = await this.getJson<BulkList>(`${ScryfallClient.API_URL}/bulk-data`);
-    const entry = list.data.find((bulk) => bulk.type === "oracle_cards");
-    if (!entry) throw new Error("Scryfall bulk-data has no oracle_cards entry");
-    return { downloadUri: entry.download_uri, updatedAt: entry.updated_at };
+    const listed = list.data.find((bulk) => bulk.type === "oracle_cards");
+    if (!listed) throw new Error("Scryfall bulk-data has no oracle_cards entry");
+
+    // The list normally carries the download link. If it does not, the
+    // item's own endpoint (`uri`) is the documented place to read it from.
+    const entry = hasDownloadLink(listed) || !listed.uri ? listed : await this.getJson<BulkItem>(listed.uri);
+    const link = downloadLinkOf(entry);
+    if (!link || !entry.updated_at) {
+      throw new Error(
+        `Scryfall's oracle_cards bulk item has no download link or updated_at. ` +
+          `Fields received: ${Object.keys(entry).join(", ")}`
+      );
+    }
+    return { ...link, updatedAt: entry.updated_at };
   }
 
+  /** Downloads a bulk file, already decompressed if it came as gzip. */
   async download(url: string): Promise<Uint8Array> {
     const response = await this.request(url);
-    return new Uint8Array(await response.arrayBuffer());
+    return inflateIfGzip(new Uint8Array(await response.arrayBuffer()));
   }
 
   /** Every oracle_id returned by a search, following all result pages. */
@@ -83,4 +109,15 @@ export class ScryfallClient {
     if (!response.ok) throw new Error(`GET ${url} → ${response.status} ${response.statusText}`);
     return response;
   }
+}
+
+function hasDownloadLink(item: BulkItem): boolean {
+  return downloadLinkOf(item) !== null;
+}
+
+/** JSON Lines first (the current format), then the original JSON array. */
+function downloadLinkOf(item: BulkItem): { downloadUri: string; format: BulkFormat } | null {
+  if (item.jsonl_download_uri) return { downloadUri: item.jsonl_download_uri, format: "jsonl" };
+  if (item.download_uri) return { downloadUri: item.download_uri, format: "json" };
+  return null;
 }

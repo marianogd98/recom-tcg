@@ -16,6 +16,7 @@
     "validate:rules": "pnpm --filter @recom-tcg/rules-schema validate",
     "data:fetch": "pnpm --filter @recom-tcg/pipeline data:fetch",
     "data:build": "pnpm --filter @recom-tcg/pipeline data:build",
+    "data:embed": "pnpm --filter @recom-tcg/pipeline data:embed",
     "check": "pnpm validate:rules && pnpm typecheck && pnpm test"
   },
   "devDependencies": {

@@ -46,6 +46,7 @@ pnpm dev              # web app on http://localhost:3000
 
 pnpm data:fetch       # download Scryfall data into data/raw/
 pnpm data:build       # build tagged card data into data/out/
+pnpm data:embed       # semantic embeddings + calibration (downloads the model once)
 ```
 
 ## Architecture

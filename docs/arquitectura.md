@@ -13,6 +13,8 @@ flowchart LR
     Y[rules/*.yaml] --> P
     R -->|data:build| P[pipeline]
     P --> O[data/out<br/>cartas etiquetadas + manifest]
+    R -->|data:embed| M[embeddings]
+    M --> O
   end
   subgraph browser["Navegador del usuario"]
     O --> W[web app]
@@ -58,7 +60,29 @@ flowchart TD
 5. **`tag-accumulator.ts`**: junta las etiquetas, quedándose con el peso máximo (nunca la suma).
 6. **`apply.ts`**: `tagCard()` orquesta los pasos 4 y 5 para una carta.
 
-## 4. SOLID en este proyecto
+## 4. La señal semántica (embeddings)
+
+Las reglas YAML son precisas pero solo detectan lo que alguien escribió. La señal semántica cubre el resto (RN-25): mide qué tan parecido es el texto de dos cartas, aunque usen palabras distintas.
+
+```mermaid
+flowchart LR
+  T["texto normalizado<br/>(tipo + Oracle, nombre = ~)"] --> E["Embedder<br/>all-MiniLM-L6-v2"]
+  E -->|384 números| P[PCA]
+  P -->|128 números| Q["int8<br/>1 byte por número"]
+  Q --> B[(embeddings.bin)]
+  Q --> C["calibración por comandante<br/>(cuantiles de similitud)"]
+  C --> J[(semantic-calibration.json)]
+```
+
+1. **`embedding-text.ts`**: el texto que lee el modelo es el mismo texto normalizado de las reglas. Como el nombre de la carta ya es `~`, la similitud sale de lo que la carta hace, nunca de cómo se llama.
+2. **`transformers-embedder.ts`**: un modelo abierto corre localmente con transformers.js. Se descarga una vez a `.cache/models`. Es el único archivo que conoce esa librería.
+3. **`pca.ts`**: reduce 384 dimensiones a 128 conservando las direcciones donde las cartas más se diferencian. En pruebas con 30 mil vectores, la similitud cambió en promedio 0,0001.
+4. **`vector.ts`** (engine): cuantiza a int8. El archivo pasa de ~45 MB a ~4 MB.
+5. **`calibration.ts`** (engine): una similitud de 0,45 puede ser altísima para un comandante y mediocre para otro. Por eso, para cada comandante se guarda la distribución de su similitud contra las cartas que podría jugar, y en el navegador la similitud cruda se convierte en percentil (RN-26).
+
+Las funciones de `vector.ts` y `calibration.ts` viven en el engine porque se usan en los dos lados: en el build para generar los datos y en el navegador para leerlos. Así ambos lados siempre calculan igual.
+
+## 5. SOLID en este proyecto
 
 | Principio | Qué dice | Dónde se aplica |
 |---|---|---|
@@ -66,11 +90,11 @@ flowchart TD
 | **O** · Abierto/cerrado | Se extiende agregando código, no modificando el existente. | Un operador nuevo de `match:` es una entrada nueva en `CARD_CONDITIONS` o `FACE_CONDITIONS`. Un chequeo nuevo del validador es un objeto nuevo en `SEMANTIC_CHECKS`. |
 | **L** · Sustitución de Liskov | Cualquier implementación de una interfaz debe poder usarse en su lugar. | Cualquier `RuleSource` funciona con `loadRules()`: el de YAML o un objeto en un test. Cualquier `FetchFn` funciona con `ScryfallClient`. |
 | **I** · Segregación de interfaces | Interfaces pequeñas, que pidan solo lo necesario. | `RuleSource` tiene dos métodos. `CardCondition` y `FaceCondition` están separadas porque se evalúan distinto. |
-| **D** · Inversión de dependencias | Lo importante depende de abstracciones, no de detalles. | `loadRules()` depende de `RuleSource`, no del disco. `ScryfallClient` recibe `fetch` y `sleep`, así los tests usan un Scryfall falso. |
+| **D** · Inversión de dependencias | Lo importante depende de abstracciones, no de detalles. | `loadRules()` depende de `RuleSource`, no del disco. `ScryfallClient` recibe `fetch` y `sleep`, así los tests usan un Scryfall falso. `buildEmbeddings()` recibe un `Embedder`: en producción un modelo real, en los tests uno falso que no descarga nada. |
 
 SOLID nació en la orientación a objetos, pero en TypeScript muchas veces se aplica con funciones y objetos literales en lugar de jerarquías de clases. En este proyecto se usan clases solo cuando hay estado o dependencias que inyectar (`ScryfallClient`, `TagAccumulator`, los *stores*). Lo demás son funciones puras.
 
-## 5. Convenciones de Clean Code
+## 6. Convenciones de Clean Code
 
 - **Nombres que dicen qué hacen:** `buildCardData`, `isDeckCard`, `matchRule`. Los booleanos empiezan con `is`, `has`, `can`.
 - **Funciones puras siempre que se pueda:** misma entrada, misma salida, sin E/S. Son las más fáciles de probar y de entender. La E/S se concentra en los bordes (`cli/`, `storage/`, `scryfall/client.ts`).
@@ -79,7 +103,7 @@ SOLID nació en la orientación a objetos, pero en TypeScript muchas veces se ap
 - **Comentarios que explican el porqué**, no el qué. Cuando una decisión viene de la especificación, se cita su regla (`RN-xx`).
 - **Un test por comportamiento**, con nombres que se leen como frases: «text conditions must hold on the same face».
 
-## 6. La web app
+## 7. La web app
 
 Next.js con el App Router y **exportación estática**: `next build` genera HTML, CSS y JS planos en `apps/web/out/`, sin servidor.
 
@@ -95,7 +119,7 @@ Los componentes reciben por *props* lo que muestran: `StepList` dibuja los pasos
 
 En M3 el flujo será: la página descarga `data/out/cards.json` una vez por versión (y lo guarda en caché), el pool se importa en el navegador y el `engine` corre dentro de un Web Worker, para que la interfaz no se congele mientras calcula.
 
-## 7. Cómo extender el proyecto
+## 8. Cómo extender el proyecto
 
 | Quiero… | Tengo que… |
 |---|---|
@@ -104,8 +128,9 @@ En M3 el flujo será: la página descarga `data/out/cards.json` una vez por vers
 | Un chequeo nuevo del validador | Un objeto `SemanticCheck` en `semantic-checks.ts`, agregado a `SEMANTIC_CHECKS`, con su test. |
 | Un tipo nuevo de archivo YAML | Su `.schema.json` y una ruta en `SCHEMA_ROUTES`. |
 | Un componente web | Una carpeta en `components/` con su `.tsx` y su `.css`. |
+| Probar otro modelo de embeddings | Cambiar `semantic.model` en `model.yaml` y correr `pnpm data:embed`. Si el modelo no es compatible con transformers.js, escribir otro `Embedder`. |
 
-## 8. Cómo leer el historial
+## 9. Cómo leer el historial
 
 Cada commit hace **un solo cambio** y su mensaje explica el porqué. Para estudiar una refactorización, lo más claro es verla commit por commit:
 

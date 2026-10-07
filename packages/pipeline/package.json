@@ -8,10 +8,12 @@
   "scripts": {
     "data:fetch": "tsx src/cli/fetch-data.ts",
     "data:build": "tsx src/cli/build-data.ts",
+    "data:embed": "tsx src/cli/embed-data.ts",
     "test": "tsx --test \"src/**/*.test.ts\"",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
+    "@huggingface/transformers": "^3.7.0",
     "@recom-tcg/engine": "workspace:*",
     "@recom-tcg/rules-schema": "workspace:*",
     "yaml": "^2.8.0"

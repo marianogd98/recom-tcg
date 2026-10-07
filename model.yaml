@@ -2,13 +2,19 @@
 # Every threshold of the model lives here, never in code (RN-23).
 # Changing a value requires the reference-pool ranking diff in the PR (RN-24).
 schema_version: 1
-version: "0.1.0"
+version: "0.2.0"
 
 synergy:
   alpha_rules: 0.7            # RN-25
   k: 30                       # RN-27
   semantic_calibration: percentile   # RN-26
   pair_affinity: { asks_gives: 1.0, same_direction: 0.5 }
+
+semantic:                     # RN-25, RN-26 · built by `pnpm data:embed`
+  model: Xenova/all-MiniLM-L6-v2   # open model (Apache-2.0), runs locally via transformers.js
+  dimensions: 128             # after PCA; 384 → 128 keeps similarities, cuts size by 3
+  batch_size: 64
+  calibration_sample: 4000    # cards per commander used to estimate its similarity distribution
 
 lands:                        # RN-44 (commander_v0)
   base: 36

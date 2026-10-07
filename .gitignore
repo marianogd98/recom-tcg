@@ -17,3 +17,6 @@ data/out/
 !.env.example
 coverage/
 *.tsbuildinfo
+
+# Downloaded models (data:embed)
+.cache/
