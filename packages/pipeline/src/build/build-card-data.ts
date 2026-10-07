@@ -33,6 +33,8 @@ export interface Manifest {
   modelVersion: string;
   rulesCount: number;
   overrides: number;
+  /** Names in each localized-name index, e.g. { es: 31000 } (RN-11). */
+  localizedNames: Record<string, number>;
   cards: number;
   commanders: number;
   tagged: number;
@@ -69,13 +71,14 @@ export function isDeckCard(card: ScryfallCard): boolean {
 
 export function createManifest(
   { cards, overridesApplied }: BuildResult,
-  versions: { updatedAt: string; modelVersion: string; rulesCount: number }
+  versions: { updatedAt: string; modelVersion: string; rulesCount: number; localizedNames?: Record<string, number> }
 ): Manifest {
   return {
     dataDate: versions.updatedAt.slice(0, 10),
     modelVersion: versions.modelVersion,
     rulesCount: versions.rulesCount,
     overrides: overridesApplied,
+    localizedNames: versions.localizedNames ?? {},
     cards: cards.length,
     commanders: cards.filter((card) => card.canBeCommander).length,
     tagged: cards.filter((card) => card.themes.length > 0 || card.roles.length > 0).length

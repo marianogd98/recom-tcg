@@ -1,10 +1,10 @@
 /**
  * `pnpm data:build` — turns data/raw/ into the browser artifacts in data/out/.
  * Run `pnpm data:fetch` first.
- *
  */
 import { readYaml, repoPaths, type OverridesFile } from "@recom-tcg/rules-schema";
 import { buildCardData, createManifest } from "../build/build-card-data.ts";
+import { buildNameIndex } from "../build/build-name-index.ts";
 import { loadRules } from "../rules/load.ts";
 import { YamlRuleSource } from "../rules/rule-source.ts";
 import { ArtifactStore } from "../storage/artifact-store.ts";
@@ -25,10 +25,20 @@ if (result.unknownOverrideCards.length > 0) {
   process.exit(1);
 }
 
-const manifest = createManifest(result, { updatedAt: raw.updatedAt, modelVersion, rulesCount: rules.length });
-new ArtifactStore(paths.outData).save(result.cards, manifest);
+const store = new ArtifactStore(paths.outData);
+const localizedNames: Record<string, number> = {};
+for (const [lang, names] of Object.entries(raw.localizedNames)) {
+  const index = buildNameIndex(names, result.cards);
+  store.saveNameIndex(lang, index);
+  localizedNames[lang] = Object.keys(index).length;
+}
+
+const manifest = createManifest(result, { updatedAt: raw.updatedAt, modelVersion, rulesCount: rules.length, localizedNames });
+store.save(result.cards, manifest);
 
 console.log(
   `✓ ${manifest.cards} cards (${result.skipped} non-deck objects skipped) · ` +
     `${manifest.tagged} tagged · ${manifest.commanders} commanders · ${manifest.overrides} overrides`
 );
+for (const [lang, count] of Object.entries(localizedNames)) console.log(`✓ names.${lang}.json: ${count} localized names`);
+if (Object.keys(localizedNames).length === 0) console.log('ℹ No localized names in data/raw. Run "pnpm data:fetch" again to build names.es.json.');

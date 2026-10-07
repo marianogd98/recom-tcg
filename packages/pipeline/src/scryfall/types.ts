@@ -1,6 +1,8 @@
 /** The subset of Scryfall's card object the pipeline reads. https://scryfall.com/docs/api/cards */
 export interface ScryfallFace {
   name: string;
+  /** The face's name as printed, on non-English printings (RN-11). */
+  printed_name?: string;
   type_line?: string;
   oracle_text?: string;
   mana_cost?: string;
@@ -18,6 +20,7 @@ export interface ScryfallCard {
   produced_mana?: string[];
   legalities: Record<string, string>;
   card_faces?: ScryfallFace[];
+  /** The name as printed, on non-English printings (RN-11). Multi-face cards carry it per face. */
   printed_name?: string;
   lang?: string;
 }
