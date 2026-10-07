@@ -1,6 +1,6 @@
 import { normalizeOracleText, type Card, type Color } from "@recom-tcg/engine";
 import type { ScryfallCard } from "./scryfall/types.ts";
-import type { RuleInput } from "./rules/apply.ts";
+import type { RuleInput } from "./rules/rule-input.ts";
 
 /** Builds what the rules look at, face by face (gramática §3.2). */
 export function toRuleInput(card: ScryfallCard): RuleInput {
