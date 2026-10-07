@@ -27,7 +27,8 @@ test("skips objects that are not deck cards (RN-18)", () => {
 });
 
 test("marks commander-eligible cards from the is:commander list (RN-01)", () => {
-  const result = buildCardData({ rawCards: fixtures, commanderIds: new Set(["fixture-elvish-archdruid"]), rules });
+  const archdruid = fixtures.find((card) => card.name === "Elvish Archdruid")!;
+  const result = buildCardData({ rawCards: fixtures, commanderIds: new Set([archdruid.oracle_id!]), rules });
   const eligible = result.cards.filter((card) => card.canBeCommander).map((card) => card.name);
   assert.deepEqual(eligible, ["Elvish Archdruid"]);
 });

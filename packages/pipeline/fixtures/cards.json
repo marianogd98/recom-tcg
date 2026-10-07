@@ -1,81 +1,115 @@
 [
   {
-    "oracle_id": "fixture-viscera-seer",
-    "name": "Viscera Seer",
-    "layout": "normal",
-    "cmc": 1,
-    "type_line": "Creature — Vampire Wizard",
-    "oracle_text": "Sacrifice a creature: Scry 1.",
-    "color_identity": ["B"],
-    "keywords": [],
-    "legalities": { "commander": "legal" }
-  },
-  {
-    "oracle_id": "fixture-carrion-feeder",
-    "name": "Carrion Feeder",
-    "layout": "normal",
-    "cmc": 1,
-    "type_line": "Creature — Zombie",
-    "oracle_text": "Carrion Feeder can't block.\nSacrifice a creature: Put a +1/+1 counter on Carrion Feeder.",
-    "color_identity": ["B"],
-    "keywords": [],
-    "legalities": { "commander": "legal" }
-  },
-  {
-    "oracle_id": "fixture-blood-artist",
+    "oracle_id": "310f141c-7f37-4729-aed6-dd9c09db448d",
     "name": "Blood Artist",
     "layout": "normal",
     "cmc": 2,
     "type_line": "Creature — Vampire",
-    "oracle_text": "Whenever Blood Artist or another creature dies, target player loses 1 life and you gain 1 life.",
-    "color_identity": ["B"],
+    "oracle_text": "Whenever this creature or another creature dies, target player loses 1 life and you gain 1 life.",
+    "color_identity": [
+      "B"
+    ],
     "keywords": [],
-    "legalities": { "commander": "legal" }
+    "legalities": {
+      "commander": "legal"
+    }
   },
   {
-    "oracle_id": "fixture-zulaport-cutthroat",
-    "name": "Zulaport Cutthroat",
-    "layout": "normal",
-    "cmc": 2,
-    "type_line": "Creature — Human Rogue Ally",
-    "oracle_text": "Whenever Zulaport Cutthroat or another creature you control dies, each opponent loses 1 life and you gain 1 life.",
-    "color_identity": ["B"],
-    "keywords": [],
-    "legalities": { "commander": "legal" }
-  },
-  {
-    "oracle_id": "fixture-llanowar-elves",
-    "name": "Llanowar Elves",
+    "oracle_id": "a1cc5e37-b09a-4b7f-afd5-77c1c35aa425",
+    "name": "Carrion Feeder",
     "layout": "normal",
     "cmc": 1,
-    "type_line": "Creature — Elf Druid",
-    "oracle_text": "{T}: Add {G}.",
-    "color_identity": ["G"],
+    "type_line": "Creature — Zombie",
+    "oracle_text": "This creature can't block.\nSacrifice a creature: Put a +1/+1 counter on this creature.",
+    "color_identity": [
+      "B"
+    ],
     "keywords": [],
-    "produced_mana": ["G"],
-    "legalities": { "commander": "legal" }
+    "legalities": {
+      "commander": "legal"
+    }
   },
   {
-    "oracle_id": "fixture-sakura-tribe-elder",
-    "name": "Sakura-Tribe Elder",
-    "layout": "normal",
-    "cmc": 2,
-    "type_line": "Creature — Snake Shaman",
-    "oracle_text": "Sacrifice Sakura-Tribe Elder: Search your library for a basic land card, put that card onto the battlefield tapped, then shuffle.",
-    "color_identity": ["G"],
-    "keywords": [],
-    "legalities": { "commander": "legal" }
-  },
-  {
-    "oracle_id": "fixture-elvish-archdruid",
+    "oracle_id": "6e2c2423-d854-4478-99e6-64f29851f026",
     "name": "Elvish Archdruid",
     "layout": "normal",
     "cmc": 3,
     "type_line": "Creature — Elf Druid",
     "oracle_text": "Other Elf creatures you control get +1/+1.\n{T}: Add {G} for each Elf you control.",
-    "color_identity": ["G"],
+    "color_identity": [
+      "G"
+    ],
     "keywords": [],
-    "produced_mana": ["G"],
-    "legalities": { "commander": "legal" }
+    "produced_mana": [
+      "G"
+    ],
+    "legalities": {
+      "commander": "legal"
+    }
+  },
+  {
+    "oracle_id": "68954295-54e3-4303-a6bc-fc4547a4e3a3",
+    "name": "Llanowar Elves",
+    "layout": "normal",
+    "cmc": 1,
+    "type_line": "Creature — Elf Druid",
+    "oracle_text": "{T}: Add {G}.",
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "produced_mana": [
+      "G"
+    ],
+    "legalities": {
+      "commander": "legal"
+    }
+  },
+  {
+    "oracle_id": "e3afc704-220f-498f-9eaa-0821b17dc24c",
+    "name": "Sakura-Tribe Elder",
+    "layout": "normal",
+    "cmc": 2,
+    "type_line": "Creature — Snake Shaman",
+    "oracle_text": "Sacrifice this creature: Search your library for a basic land card, put that card onto the battlefield tapped, then shuffle.",
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "legalities": {
+      "commander": "legal"
+    }
+  },
+  {
+    "oracle_id": "f82a4e85-526d-4456-b700-7760043a31be",
+    "name": "Viscera Seer",
+    "layout": "normal",
+    "cmc": 1,
+    "type_line": "Creature — Vampire Wizard",
+    "oracle_text": "Sacrifice a creature: Scry 1. (Look at the top card of your library. You may put that card on the bottom.)",
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [
+      "Scry"
+    ],
+    "legalities": {
+      "commander": "legal"
+    }
+  },
+  {
+    "oracle_id": "76b003e0-15af-4f22-bdf2-1ade5430964a",
+    "name": "Zulaport Cutthroat",
+    "layout": "normal",
+    "cmc": 2,
+    "type_line": "Creature — Human Rogue Ally",
+    "oracle_text": "Whenever this creature or another creature you control dies, each opponent loses 1 life and you gain 1 life.",
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "legalities": {
+      "commander": "legal"
+    }
   }
 ]
