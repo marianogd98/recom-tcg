@@ -6,8 +6,8 @@
   "description": "Build-time data pipeline: Scryfall bulk data → normalized, tagged, versioned artifacts for the browser.",
   "type": "module",
   "scripts": {
-    "data:fetch": "tsx src/scryfall/fetch.ts",
-    "data:build": "tsx src/build-data.ts",
+    "data:fetch": "tsx src/cli/fetch-data.ts",
+    "data:build": "tsx src/cli/build-data.ts",
     "test": "tsx --test \"src/**/*.test.ts\"",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },

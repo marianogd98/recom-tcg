@@ -31,7 +31,7 @@ export function landValue(card: ScryfallCard): number {
 const LEGALITY = new Set(["legal", "banned", "not_legal", "restricted"]);
 
 /** Converts a Scryfall card into the engine's Card, without tags. */
-export function toEngineCard(card: ScryfallCard, commanderIds: Set<string>): Omit<Card, "themes" | "roles"> {
+export function toEngineCard(card: ScryfallCard, commanderIds: ReadonlySet<string>): Omit<Card, "themes" | "roles"> {
   const legality = card.legalities["commander"] ?? "not_legal";
   return {
     oracleId: card.oracle_id ?? "",
