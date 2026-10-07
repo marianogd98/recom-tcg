@@ -7,25 +7,23 @@
  * percentiles (RN-26), and sharding by color identity.
  */
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
-import { readYaml } from "@recom-tcg/rules-schema";
+import { join } from "node:path";
+import { readYaml, repoPaths } from "@recom-tcg/rules-schema";
 import type { Card } from "@recom-tcg/engine";
 import { loadRules } from "./rules/load.ts";
 import { tagCard } from "./rules/apply.ts";
 import { toEngineCard, toRuleInput } from "./normalize.ts";
 import { NON_DECK_LAYOUTS, type ScryfallCard } from "./scryfall/types.ts";
 
-const here = dirname(fileURLToPath(import.meta.url));
-const root = resolve(here, "../../..");
-const rawDir = join(root, "data/raw");
-const outDir = join(root, "data/out");
+const paths = repoPaths(import.meta.dirname);
+const rawDir = paths.rawData;
+const outDir = paths.outData;
 
 const raw: ScryfallCard[] = JSON.parse(readFileSync(join(rawDir, "oracle-cards.json"), "utf8"));
 const commanderIds = new Set<string>(JSON.parse(readFileSync(join(rawDir, "commanders.json"), "utf8")));
 const meta = JSON.parse(readFileSync(join(rawDir, "meta.json"), "utf8")) as { updated_at: string };
-const model = readYaml<{ version: string }>(join(root, "model.yaml"));
-const rules = loadRules(join(root, "rules"));
+const model = readYaml<{ version: string }>(paths.model);
+const rules = loadRules(paths.rules);
 
 const cards: Card[] = [];
 let skipped = 0;

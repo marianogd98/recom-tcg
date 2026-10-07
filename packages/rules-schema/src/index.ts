@@ -56,3 +56,5 @@ export function expandMacros(pattern: string, macros: Record<string, string>): s
 export function compilePattern(pattern: string, macros: Record<string, string>): RegExp {
   return new RegExp(expandMacros(pattern, macros), "i");
 }
+
+export { REPO_LAYOUT, findRepoRoot, repoPaths, type RepoPaths } from "./repo.ts";

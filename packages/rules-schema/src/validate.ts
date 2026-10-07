@@ -8,14 +8,13 @@
  * Exits with code 1 and a readable list when anything fails.
  */
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { dirname, join, relative, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join, relative, resolve } from "node:path";
 import Ajv from "ajv";
-import { compilePattern, readYaml, type RuleFile, type Vocabulary } from "./index.ts";
+import { compilePattern, readYaml, repoPaths, type RuleFile, type Vocabulary } from "./index.ts";
 
-const here = dirname(fileURLToPath(import.meta.url));
-const schemasDir = resolve(here, "../schemas");
-const repoRoot = resolve(here, "../../..");
+const schemasDir = resolve(import.meta.dirname, "../schemas");
+const paths = repoPaths(import.meta.dirname);
+const repoRoot = paths.root;
 
 const ajv = new Ajv({ allErrors: true });
 const validators = new Map<string, ReturnType<typeof ajv.compile>>();
@@ -46,9 +45,9 @@ function walk(dir: string): string[] {
 
 const errors: string[] = [];
 const yamlFiles = [
-  join(repoRoot, "model.yaml"),
-  ...walk(join(repoRoot, "rules")),
-  ...walk(join(repoRoot, "import-profiles"))
+  paths.model,
+  ...walk(paths.rules),
+  ...walk(paths.importProfiles)
 ].filter((f) => /\.ya?ml$/.test(f));
 
 for (const file of yamlFiles) {
@@ -75,7 +74,7 @@ for (const file of yamlFiles) {
 }
 
 // Semantic checks on rules.
-const vocabulary = readYaml<Vocabulary>(join(repoRoot, "rules/vocabulary.yaml"));
+const vocabulary = readYaml<Vocabulary>(paths.vocabulary);
 const themes = new Set(vocabulary.themes.map((t) => t.id));
 const roles = new Set(vocabulary.roles.map((r) => r.id));
 const seen = new Map<string, string>();
