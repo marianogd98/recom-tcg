@@ -4,25 +4,52 @@
   "title": "ReCom TCG rule file",
   "description": "Theme or role rules applied to every card's normalized Oracle text at build time. Rules only produce tags, never scores.",
   "type": "object",
-  "required": ["schema_version", "rules"],
+  "required": [
+    "schema_version",
+    "rules"
+  ],
   "additionalProperties": false,
   "properties": {
-    "schema_version": { "const": 1 },
-    "rules": { "type": "array", "items": { "$ref": "#/definitions/rule" } }
+    "schema_version": {
+      "const": 1
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/rule"
+      }
+    }
   },
   "definitions": {
     "patterns": {
       "type": "array",
       "minItems": 1,
-      "items": { "type": "string", "minLength": 1 }
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
     },
     "rule": {
       "type": "object",
-      "required": ["id", "weight", "match", "examples"],
+      "required": [
+        "id",
+        "weight",
+        "match",
+        "examples"
+      ],
       "additionalProperties": false,
       "oneOf": [
-        { "required": ["theme", "provides"] },
-        { "required": ["role"] }
+        {
+          "required": [
+            "theme",
+            "provides"
+          ]
+        },
+        {
+          "required": [
+            "role"
+          ]
+        }
       ],
       "properties": {
         "id": {
@@ -30,13 +57,26 @@
           "pattern": "^[a-z0-9_-]+(\\.[a-z0-9_-]+)+$",
           "description": "Unique id, format theme.name or role.name."
         },
-        "theme": { "type": "string", "description": "A theme id from rules/vocabulary.yaml." },
-        "role": { "type": "string", "description": "A role id from rules/vocabulary.yaml." },
+        "theme": {
+          "type": "string",
+          "description": "A theme id from rules/vocabulary.yaml."
+        },
+        "role": {
+          "type": "string",
+          "description": "A role id from rules/vocabulary.yaml."
+        },
         "provides": {
-          "enum": ["asks", "gives"],
+          "enum": [
+            "asks",
+            "gives"
+          ],
           "description": "gives = enables the theme; asks = rewards it."
         },
-        "weight": { "type": "number", "minimum": 0.1, "maximum": 1 },
+        "weight": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 1
+        },
         "capture": {
           "type": "string",
           "description": "Named regex group whose value becomes part of the theme, e.g. tribal:elf."
@@ -46,22 +86,55 @@
           "minProperties": 1,
           "additionalProperties": false,
           "properties": {
-            "text_any": { "$ref": "#/definitions/patterns" },
-            "text_all": { "$ref": "#/definitions/patterns" },
-            "text_none": { "$ref": "#/definitions/patterns" },
-            "type_any": { "$ref": "#/definitions/patterns" },
-            "type_none": { "$ref": "#/definitions/patterns" },
-            "keywords_any": { "$ref": "#/definitions/patterns" },
-            "produces_mana": { "type": "boolean" }
+            "text_any": {
+              "$ref": "#/definitions/patterns"
+            },
+            "text_all": {
+              "$ref": "#/definitions/patterns"
+            },
+            "text_none": {
+              "$ref": "#/definitions/patterns"
+            },
+            "type_any": {
+              "$ref": "#/definitions/patterns"
+            },
+            "type_none": {
+              "$ref": "#/definitions/patterns"
+            },
+            "keywords_any": {
+              "$ref": "#/definitions/patterns"
+            },
+            "produces_mana": {
+              "type": "boolean"
+            },
+            "produces_colors_min": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5,
+              "description": "The card produces mana of at least this many different colors (fixing)."
+            }
           }
         },
         "examples": {
           "type": "object",
-          "required": ["match"],
+          "required": [
+            "match"
+          ],
           "additionalProperties": false,
           "properties": {
-            "match": { "type": "array", "minItems": 1, "items": { "type": "string" } },
-            "no_match": { "type": "array", "items": { "type": "string" } }
+            "match": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string"
+              }
+            },
+            "no_match": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           }
         }
       }

@@ -22,7 +22,10 @@ export interface ScryfallCard {
   lang?: string;
 }
 
-/** Layouts that are never deck cards (RN-18). */
+/**
+ * Layouts that are never deck cards (RN-18). "front_card" is memorabilia
+ * (decorative card fronts), never legal; it was found in the 2026 bulk data.
+ */
 export const NON_DECK_LAYOUTS = new Set([
   "token",
   "double_faced_token",
@@ -31,5 +34,6 @@ export const NON_DECK_LAYOUTS = new Set([
   "planar",
   "scheme",
   "vanguard",
-  "reversible_card"
+  "reversible_card",
+  "front_card"
 ]);

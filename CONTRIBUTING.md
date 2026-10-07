@@ -27,7 +27,14 @@ Rules live in `rules/themes/` and `rules/roles/`. Each rule matches patterns in 
     no_match: [Sakura-Tribe Elder]
 ```
 
-Every card named in `examples` must exist in `packages/pipeline/fixtures/cards.json` with its exact Oracle text (copy it from Scryfall). Open VS Code with the recommended YAML extension and you get autocompletion and errors as you type.
+Every card named in `examples` must exist in `packages/pipeline/fixtures/cards.json` with its exact Oracle text. You don't copy it by hand: after `pnpm data:fetch`, run `pnpm fixtures:sync` and the fixture file is regenerated from the downloaded Scryfall data. Open VS Code with the recommended YAML extension and you get autocompletion and errors as you type.
+
+Examples prove that a rule catches the cards you thought of; they don't show what else it catches. Before and after editing a rule, run `pnpm rules:report <id-prefix>` (for example `pnpm rules:report removal.`): it prints how many cards of the real Commander pool each rule tags, with sample names spread across the alphabet. A count that jumps by thousands, or a sample that makes you frown, means the pattern is too loose. A few patterns that kept biting us:
+
+- A regex can start matching in the middle of a word. Put `\b` before a capture so `sorcery spells` doesn't become the creature type `orcery`.
+- Scryfall's `produced_mana` includes the colors of tokens a card creates, so a Treasure maker "produces" all five colors. Pair `produces_colors_min` with a text or type condition.
+- Reminder text is removed, so a shock land's `({t}: add {g} or {u}.)` is not in its text. Use `type_any` / `produces_mana` for lands.
+- Real Oracle text often says "this creature" instead of the name; both become `~`.
 
 New themes go into `rules/vocabulary.yaml` first, in their own pull request.
 

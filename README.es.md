@@ -32,7 +32,7 @@ pnpm dev              # la web en http://localhost:3000
 
 pnpm data:fetch       # descarga los datos de Scryfall en data/raw/
 pnpm data:build       # genera los datos etiquetados en data/out/
-pnpm data:embed       # embeddings semánticos y calibración (descarga el modelo una vez)
+pnpm data:embed       # embeddings semánticos y calibración, después de data:build (descarga el modelo una vez)
 ```
 
 Cómo está construido por dentro, y las convenciones de Clean Code y SOLID que sigue el código: [`docs/arquitectura.md`](docs/arquitectura.md).

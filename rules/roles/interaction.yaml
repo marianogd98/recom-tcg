@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=../../packages/rules-schema/schemas/rule-file.schema.json
+schema_version: 1
+
+rules:
+  - id: counterspell.counter-spell
+    role: counterspell
+    weight: 1.0
+    match:
+      text_any:
+        - 'counter target [a-z ,-]{0,40}spell'
+    examples:
+      match: [Counterspell, Negate, Mana Leak]
+      no_match: [Lightning Bolt]
+
+  - id: wipe.board
+    role: wipe
+    weight: 1.0
+    match:
+      text_any:
+        - '(?:destroy|exile) (?:all|each) (?:other )?(?:nontoken )?(?:creatures|nonland permanents|permanents|artifacts|enchantments|creatures and planeswalkers)'
+        - 'all (?:other )?creatures get -(?:\d+|x)/-(?:\d+|x)'
+        - 'deals? (?:\d+|x) damage to each creature'
+        - "return all (?:creatures|nonland permanents) to their owners' hands"
+    examples:
+      match: [Wrath of God, Pyroclasm, Toxic Deluge]
+      no_match: [Doom Blade]
+
+  - id: graveyard-hate.exile
+    role: graveyard_hate
+    weight: 1.0
+    match:
+      text_any:
+        - "exile (?:all cards from )?target player's graveyard"
+        - "exile (?:target card|up to \\w+ target cards) from (?:a|an opponent's) graveyard"
+        - 'exile all (?:cards from all )?graveyards'
+        - "exile each opponent's graveyard"
+        - "would be put into (?:a|an opponent's) graveyard from anywhere, exile it instead"
+    examples:
+      match: [Bojuka Bog, Relic of Progenitus, Rest in Peace]
+      no_match: [Eternal Witness]
+
+  - id: protection.grant
+    role: protection
+    weight: 1.0
+    match:
+      text_any:
+        - '(?:creatures|permanents) you control (?:gain|have) (?:hexproof|indestructible|shroud|protection)'
+        - 'target (?:creature|permanent)(?: you control)? gains? (?:hexproof|indestructible|shroud|protection)'
+        - '(?:equipped|enchanted) creature has (?:hexproof|indestructible|shroud|protection)'
+        - '\bphases? out\b'
+    examples:
+      match: [Heroic Intervention, Swiftfoot Boots, Teferi's Protection]
+      no_match: [Bonesplitter]

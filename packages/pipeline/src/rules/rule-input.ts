@@ -8,4 +8,6 @@ export interface RuleInput {
   typeLine: string;
   keywords: string[];
   producesMana: boolean;
+  /** Colors among the mana the card can produce (W, U, B, R, G), from Scryfall's produced_mana. */
+  producedColors: string[];
 }

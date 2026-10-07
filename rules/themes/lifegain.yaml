@@ -1,0 +1,39 @@
+# yaml-language-server: $schema=../../packages/rules-schema/schemas/rule-file.schema.json
+schema_version: 1
+
+rules:
+  - id: lifegain.gain
+    theme: lifegain
+    provides: gives
+    weight: 0.6
+    match:
+      text_any:
+        - 'you gain (?:\d+|x|that much|an amount of) life'
+        - 'you gain life equal to'
+    examples:
+      match: [Blood Artist]
+      no_match: [Llanowar Elves]
+
+  - id: lifegain.lifelink
+    theme: lifegain
+    provides: gives
+    weight: 0.6
+    match:
+      keywords_any: ['^lifelink$']
+    examples:
+      match: [Vampire Nighthawk]
+      no_match: [Llanowar Elves]
+
+  - id: lifegain.payoff
+    theme: lifegain
+    provides: asks
+    weight: 1.0
+    match:
+      text_any:
+        - 'whenever you gain life'
+        - 'if you would gain life'
+        - 'for each 1 life you gained'
+        - 'if you gained life this turn'
+    examples:
+      match: [Ajani's Pridemate]
+      no_match: [Blood Artist]

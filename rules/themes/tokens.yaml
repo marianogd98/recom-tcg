@@ -1,0 +1,52 @@
+# yaml-language-server: $schema=../../packages/rules-schema/schemas/rule-file.schema.json
+schema_version: 1
+
+rules:
+  - id: tokens.create-creature
+    theme: tokens
+    provides: gives
+    weight: 1.0
+    match:
+      text_any:
+        - 'create [^.]{0,80}creature tokens?'
+    examples:
+      match: [Raise the Alarm, Bitterblossom]
+      no_match: [Llanowar Elves]
+
+  - id: tokens.create-noncreature
+    theme: tokens
+    provides: gives
+    weight: 0.5
+    match:
+      text_any:
+        - 'create [^.]{0,40}\b(?:treasure|clue|food|blood|map|powerstone|gold|junk|incubator)\b[^.]{0,20}tokens?'
+    examples:
+      match: [Tireless Provisioner]
+      no_match: [Sol Ring]
+
+  - id: tokens.payoff
+    theme: tokens
+    provides: asks
+    weight: 1.0
+    match:
+      text_any:
+        - '(?:creature )?tokens you control (?:get|have)'
+        - 'would create one or more tokens'
+        - 'if one or more tokens would be created'
+        - 'whenever (?:one or more )?(?:a )?(?:creature )?tokens? (?:you control )?enters?'
+        - 'for each (?:creature )?token you control'
+    examples:
+      match: [Anointed Procession, Intangible Virtue]
+      no_match: [Raise the Alarm]
+
+  - id: tokens.anthem
+    theme: tokens
+    provides: asks
+    weight: 0.6
+    match:
+      text_any:
+        # Only plain anthems: "Elf creatures you control get…" is tribal, not go-wide.
+        - '(?:^|\n|[.:,] )(?:other )?creatures you control get \+\d+/\+\d+'
+    examples:
+      match: [Glorious Anthem]
+      no_match: [Raise the Alarm, Elvish Archdruid]

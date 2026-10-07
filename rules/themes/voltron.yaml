@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=../../packages/rules-schema/schemas/rule-file.schema.json
+schema_version: 1
+
+rules:
+  - id: voltron.equipment
+    theme: voltron
+    provides: gives
+    weight: 0.8
+    match:
+      type_any: ['\bequipment\b']
+    examples:
+      match: [Bonesplitter]
+      no_match: [Sol Ring]
+
+  - id: voltron.aura
+    theme: voltron
+    provides: gives
+    weight: 0.7
+    match:
+      type_any: ['\baura\b']
+      text_any:
+        - 'enchanted creature gets \+'
+        - 'enchanted creature has'
+      text_none:
+        - "can't attack"
+        - "can't block"
+        - "doesn't untap"
+        - 'loses all abilities'
+    examples:
+      match: [Rancor]
+      no_match: [Pacifism]
+
+  - id: voltron.payoff
+    theme: voltron
+    provides: asks
+    weight: 1.0
+    match:
+      text_any:
+        - 'whenever you cast an (?:aura|equipment)'
+        - 'for each (?:aura|equipment)[^.]{0,30}attached'
+        - 'whenever (?:an|another) (?:aura|equipment) (?:you control )?(?:enters|becomes attached)'
+        - 'equip abilities you activate cost'
+        - '(?:auras|equipment) you control'
+    examples:
+      match: ["Sram, Senior Edificer", Puresteel Paladin]
+      no_match: [Bonesplitter]

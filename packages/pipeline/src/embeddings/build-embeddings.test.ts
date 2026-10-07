@@ -24,7 +24,9 @@ const fakeEmbedder: Embedder = {
   }
 };
 
+let nextIndex = 0;
 const card = (oracleId: string, text: string, colorIdentity: EmbeddingCard["colorIdentity"], canBeCommander = false): EmbeddingCard => ({
+  cardIndex: nextIndex++,
   oracleId,
   text,
   colorIdentity,
@@ -43,17 +45,20 @@ const cards: EmbeddingCard[] = [
 ];
 
 const settings = { dimensions: 6, batchSize: 3, calibrationSample: 100 };
+const version = { dataDate: "2026-10-06", cardCount: 10 };
 
 test("produces one int8 row per card at the requested size", async () => {
-  const { header, vectors } = await buildEmbeddings(cards, fakeEmbedder, settings);
+  const { header, vectors } = await buildEmbeddings(cards, fakeEmbedder, settings, version);
   assert.equal(header.dimensions, 6);
   assert.equal(header.model, "fake/bag-of-words");
-  assert.deepEqual(header.oracleIds, cards.map((c) => c.oracleId));
+  assert.deepEqual(header.cardIndexes, cards.map((c) => c.cardIndex));
+  assert.equal(header.cardCount, 10);
+  assert.equal(header.dataDate, "2026-10-06");
   assert.equal(vectors.length, cards.length * 6);
 });
 
 test("cards that do similar things stay close after PCA and int8", async () => {
-  const { vectors } = await buildEmbeddings(cards, fakeEmbedder, settings);
+  const { vectors } = await buildEmbeddings(cards, fakeEmbedder, settings, version);
   const row = (id: string) => {
     const i = cards.findIndex((c) => c.oracleId === id);
     return vectors.subarray(i * 6, (i + 1) * 6);
@@ -62,7 +67,7 @@ test("cards that do similar things stay close after PCA and int8", async () => {
 });
 
 test("only commanders are calibrated, against cards of their identity (RN-26)", async () => {
-  const { calibration, header } = await buildEmbeddings(cards, fakeEmbedder, settings);
+  const { calibration, header } = await buildEmbeddings(cards, fakeEmbedder, settings, version);
   assert.deepEqual(Object.keys(calibration), ["meren"]);
   const quantiles = calibration["meren"]!;
   assert.equal(quantiles.length, header.quantileLevels.length);
@@ -73,6 +78,6 @@ test("only commanders are calibrated, against cards of their identity (RN-26)", 
 
 test("reports progress for each step", async () => {
   const steps = new Set<string>();
-  await buildEmbeddings(cards, fakeEmbedder, settings, (step) => steps.add(step));
+  await buildEmbeddings(cards, fakeEmbedder, settings, version, (step) => steps.add(step));
   assert.deepEqual([...steps], ["embed", "calibrate"]);
 });

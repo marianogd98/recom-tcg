@@ -2,6 +2,8 @@ import { normalizeOracleText, type Card, type Color } from "@recom-tcg/engine";
 import type { ScryfallCard } from "./scryfall/types.ts";
 import type { RuleInput } from "./rules/rule-input.ts";
 
+const COLORS = new Set(["W", "U", "B", "R", "G"]);
+
 /** Builds what the rules look at, face by face (gramática §3.2). */
 export function toRuleInput(card: ScryfallCard): RuleInput {
   const faces = card.card_faces?.length
@@ -12,7 +14,8 @@ export function toRuleInput(card: ScryfallCard): RuleInput {
     faces,
     typeLine,
     keywords: card.keywords ?? [],
-    producesMana: (card.produced_mana ?? []).length > 0
+    producesMana: (card.produced_mana ?? []).length > 0,
+    producedColors: (card.produced_mana ?? []).filter((symbol) => COLORS.has(symbol))
   };
 }
 

@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=../../packages/rules-schema/schemas/rule-file.schema.json
+schema_version: 1
+
+rules:
+  - id: spellslinger.is-spell
+    theme: spellslinger
+    provides: gives
+    weight: 0.4
+    match:
+      type_any: ['\binstant\b', '\bsorcery\b']
+    examples:
+      match: [Lightning Bolt]
+      no_match: [Sol Ring]
+
+  - id: spellslinger.payoff
+    theme: spellslinger
+    provides: asks
+    weight: 1.0
+    match:
+      text_any:
+        - 'whenever you cast (?:an|a|your first|your second) ?(?:instant or sorcery|noncreature|instant|sorcery) spell'
+        - 'whenever you cast or copy an instant or sorcery spell'
+        - 'instant and sorcery spells you cast cost'
+        - 'copy target instant or sorcery spell'
+    examples:
+      match: [Young Pyromancer]
+      no_match: [Lightning Bolt]
+
+  - id: spellslinger.keyword
+    theme: spellslinger
+    provides: asks
+    weight: 0.7
+    match:
+      keywords_any: ['^(?:prowess|magecraft)$']
+    examples:
+      match: [Monastery Swiftspear]
+      no_match: [Llanowar Elves]

@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=../../packages/rules-schema/schemas/rule-file.schema.json
+schema_version: 1
+
+rules:
+# Scryfall's produced_mana also lists the colors of tokens a card makes
+# (a Treasure maker "produces" all five), so a nonland source must say
+# "add" itself. Shock lands lose their "add" with the reminder text, which
+# is why lands get a rule of their own.
+  - id: fixing.multicolor-land
+    role: fixing
+    weight: 1.0
+    match:
+      type_any: ['\bland\b']
+      produces_colors_min: 2
+    examples:
+      match: [Command Tower, Breeding Pool]
+      no_match: [Bojuka Bog, Arcane Signet]
+
+  - id: fixing.multicolor-source
+    role: fixing
+    weight: 1.0
+    match:
+      type_none: ['\bland\b']
+      produces_colors_min: 2
+      text_any: ['\badd\b']
+    examples:
+      match: [Arcane Signet, Birds of Paradise]
+      no_match: [Sol Ring, Llanowar Elves, Ruthless Knave, Command Tower]
+
+  - id: fixing.fetch-typed
+    role: fixing
+    weight: 0.8
+    match:
+      text_any:
+        - 'search your library for an? (?:basic )?(?:plains|island|swamp|mountain|forest) or (?:plains|island|swamp|mountain|forest) card'
+    examples:
+      match: [Wooded Foothills]
+      no_match: [Cultivate]
+
+  - id: land.is-land
+    role: land
+    weight: 1.0
+    match:
+      type_any: ['\bland\b']
+    examples:
+      match: [Command Tower, Bojuka Bog]
+      no_match: [Sol Ring]

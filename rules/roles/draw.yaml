@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=../../packages/rules-schema/schemas/rule-file.schema.json
+schema_version: 1
+
+rules:
+  - id: draw.multiple
+    role: draw
+    weight: 1.0
+    match:
+      text_any:
+        - 'draws? (?:two|three|four|five|seven|x|that many|\d+) cards'
+    examples:
+      match: [Harmonize, Night's Whisper]
+      no_match: [Lightning Bolt]
+
+  - id: draw.repeatable
+    role: draw
+    weight: 0.9
+    match:
+      text_any:
+        - 'whenever [^.]{0,80}, (?:you )?(?:may )?draw (?:a|two) cards?'
+    examples:
+      match: [Argothian Enchantress, Eidolon of Blossoms]
+      no_match: [Lightning Bolt]
+
+  - id: draw.single
+    role: draw
+    weight: 0.5
+    match:
+      text_any:
+        - '\bdraw a card'
+    examples:
+      match: [Opt]
+      no_match: [Lightning Bolt]
+
+  - id: draw.impulse
+    role: draw
+    weight: 0.7
+    match:
+      text_any:
+        - 'exile the top [^.]{0,40}of your library\.[^.]{0,60}you may (?:play|cast)'
+    examples:
+      match: [Light Up the Stage]
+      no_match: [Opt]

@@ -20,13 +20,15 @@ const token: ScryfallCard = {
 };
 
 test("skips objects that are not deck cards (RN-18)", () => {
-  const result = buildCardData({ rawCards: [...fixtures, token], commanderIds: new Set(), rules });
+  const memorabilia: ScryfallCard = { ...token, oracle_id: "fixture-front", layout: "front_card" };
+  const result = buildCardData({ rawCards: [...fixtures, token, memorabilia], commanderIds: new Set(), rules });
   assert.equal(result.cards.length, fixtures.length);
-  assert.equal(result.skipped, 1);
+  assert.equal(result.skipped, 2);
 });
 
 test("marks commander-eligible cards from the is:commander list (RN-01)", () => {
-  const result = buildCardData({ rawCards: fixtures, commanderIds: new Set(["fixture-elvish-archdruid"]), rules });
+  const archdruid = fixtures.find((card) => card.name === "Elvish Archdruid")!;
+  const result = buildCardData({ rawCards: fixtures, commanderIds: new Set([archdruid.oracle_id!]), rules });
   const eligible = result.cards.filter((card) => card.canBeCommander).map((card) => card.name);
   assert.deepEqual(eligible, ["Elvish Archdruid"]);
 });

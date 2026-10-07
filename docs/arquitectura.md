@@ -60,6 +60,13 @@ flowchart TD
 5. **`tag-accumulator.ts`**: junta las etiquetas, quedándose con el peso máximo (nunca la suma).
 6. **`apply.ts`**: `tagCard()` orquesta los pasos 4 y 5 para una carta.
 
+Dos herramientas acompañan a quien escribe reglas, y ninguna toca el motor:
+
+- **`pnpm fixtures:sync`** (`cli/sync-fixtures.ts` + `scryfall/fixture.ts`): junta los nombres de todos los `examples`, los busca en los datos descargados y reescribe `fixtures/cards.json` con solo los campos que leen las reglas. Así los tests usan el texto Oracle real y siguen corriendo sin red.
+- **`pnpm rules:report [prefijo]`** (`cli/rules-report.ts` + `rules/coverage.ts`): aplica cada regla al pool de Commander completo y muestra cuántas cartas etiqueta, con muestras. `measureCoverage()` es una función pura (recibe cartas y reglas, devuelve números), por eso tiene su propio test y el CLI solo imprime.
+
+Los ejemplos miden la *exhaustividad* de una regla (¿atrapa lo que esperaba?); el reporte mide su *precisión* (¿qué más atrapa?). Hacen falta las dos.
+
 ## 4. La señal semántica (embeddings)
 
 Las reglas YAML son precisas pero solo detectan lo que alguien escribió. La señal semántica cubre el resto (RN-25): mide qué tan parecido es el texto de dos cartas, aunque usen palabras distintas.
@@ -80,7 +87,11 @@ flowchart LR
 4. **`vector.ts`** (engine): cuantiza a int8. El archivo pasa de ~45 MB a ~4 MB.
 5. **`calibration.ts`** (engine): una similitud de 0,45 puede ser altísima para un comandante y mediocre para otro. Por eso, para cada comandante se guarda la distribución de su similitud contra las cartas que podría jugar, y en el navegador la similitud cruda se convierte en percentil (RN-26).
 
-Las funciones de `vector.ts` y `calibration.ts` viven en el engine porque se usan en los dos lados: en el build para generar los datos y en el navegador para leerlos. Así ambos lados siempre calculan igual.
+Solo se calculan vectores para el **pool de Commander** (cartas legales y prohibidas): unas 32 mil de las ~35 mil de `cards.json`. Las cartas de colecciones «Un», Alchemy o memorabilia siguen en `cards.json`, para que la importación pueda reconocerlas y reportarlas (RN-19), pero no compiten en el ranking y no necesitan vector.
+
+`embeddings.bin` no repite los identificadores de las cartas: `embeddings.json` guarda, para cada fila, su posición en `cards.json` (`cardIndexes`). `openEmbeddingTable()` une ambos archivos y se niega a hacerlo si vienen de builds distintos, porque eso pegaría vectores a cartas equivocadas sin avisar. Por eso `data:embed` se ejecuta siempre después de `data:build`.
+
+Las funciones de `vector.ts`, `calibration.ts` y `artifacts.ts` viven en el engine porque se usan en los dos lados: en el build para generar los datos y en el navegador para leerlos. Así ambos lados siempre calculan igual.
 
 ## 5. SOLID en este proyecto
 
@@ -123,7 +134,7 @@ En M3 el flujo será: la página descarga `data/out/cards.json` una vez por vers
 
 | Quiero… | Tengo que… |
 |---|---|
-| Detectar una mecánica nueva | Agregar una regla en `rules/themes/` o `rules/roles/` con sus `examples`, y las cartas de ejemplo en `packages/pipeline/fixtures/cards.json`. |
+| Detectar una mecánica nueva | Agregar una regla en `rules/themes/` o `rules/roles/` con sus `examples`, correr `pnpm fixtures:sync` para traer las cartas de ejemplo y revisar la precisión con `pnpm rules:report <prefijo>`. |
 | Un operador nuevo en `match:` | Una entrada en `conditions.ts` y la propiedad en `rule-file.schema.json`. |
 | Un chequeo nuevo del validador | Un objeto `SemanticCheck` en `semantic-checks.ts`, agregado a `SEMANTIC_CHECKS`, con su test. |
 | Un tipo nuevo de archivo YAML | Su `.schema.json` y una ruta en `SCHEMA_ROUTES`. |
