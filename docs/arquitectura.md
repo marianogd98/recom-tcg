@@ -67,6 +67,14 @@ Dos herramientas acompañan a quien escribe reglas, y ninguna toca el motor:
 
 Los ejemplos miden la *exhaustividad* de una regla (¿atrapa lo que esperaba?); el reporte mide su *precisión* (¿qué más atrapa?). Hacen falta las dos.
 
+### Overrides: la corrección a mano
+
+Cuando una regla lee mal **una** carta, `rules/overrides.yaml` la corrige. `applyOverride()` (`rules/overrides.ts`) corre después de las reglas: primero quita, después añade. Una etiqueta añadida *reemplaza* a la de la regla en vez de fusionarse con el máximo, porque el override existe justamente porque una persona leyó la carta y no estuvo de acuerdo con el regex. Las etiquetas añadidas llevan `ruleIds: ["override"]`, así «ver cálculo» (RN-58) puede decir de dónde salió cada una.
+
+El formato de `remove:` (`"counters"`, `"counters/gives"`, `"tribal"`, `"tribal:elf"`) se interpreta en un solo lugar, `tag-selector.ts` de `rules-schema`, que usan tanto el validador como el build. Si cada uno lo leyera a su manera, el validador podría aprobar algo que el build entiende distinto.
+
+Si un override nombra una carta que no existe, `data:build` se detiene: un override con el nombre mal escrito no haría nada, y nadie se enteraría. `pnpm validate:rules` muestra cuántos overrides acumula cada tema; muchos en uno indican que hay que reescribir la regla, no parcharla carta por carta.
+
 ## 4. La señal semántica (embeddings)
 
 Las reglas YAML son precisas pero solo detectan lo que alguien escribió. La señal semántica cubre el resto (RN-25): mide qué tan parecido es el texto de dos cartas, aunque usen palabras distintas.
@@ -92,6 +100,16 @@ Solo se calculan vectores para el **pool de Commander** (cartas legales y prohib
 `embeddings.bin` no repite los identificadores de las cartas: `embeddings.json` guarda, para cada fila, su posición en `cards.json` (`cardIndexes`). `openEmbeddingTable()` une ambos archivos y se niega a hacerlo si vienen de builds distintos, porque eso pegaría vectores a cartas equivocadas sin avisar. Por eso `data:embed` se ejecuta siempre después de `data:build`.
 
 Las funciones de `vector.ts`, `calibration.ts` y `artifacts.ts` viven en el engine porque se usan en los dos lados: en el build para generar los datos y en el navegador para leerlos. Así ambos lados siempre calculan igual.
+
+### Nombres en español (RN-11) y copias (RN-16, RN-17)
+
+Un jugador en Caracas exporta «Elfos de Llanowar», no «Llanowar Elves». Para eso el build escribe `names.es.json`:
+
+1. **`data:fetch`** pide a Scryfall cada impresión en español (`lang:es`, una por impresión, porque la traducción de una carta a veces cambió entre colecciones) y `scryfall/localized-names.ts` se queda solo con nombre + `oracle_id`, incluyendo cada cara de las cartas dobles (RN-12).
+2. **`data:build`** (`build/build-name-index.ts`) arma el índice *nombre normalizado → oracle_ids*. Deja fuera los nombres iguales al inglés, que el importador ya encuentra en `cards.json`. Si dos cartas comparten traducción quedan las dos, y el importador preguntará cuál es (RN-13, «ambigua»).
+3. La clave la calcula **`normalizeCardName()`** del engine: minúsculas, sin tildes, comillas rectas. El importador del navegador usará la misma función; si cada lado normalizara distinto, «Sanadora de Ánimos» se encontraría en uno y no en el otro.
+
+`Card.copyLimit` dice cuántas copias admite un mazo: `1` casi siempre, `7` para Seven Dwarves, `"any"` para Relentless Rats y las tierras básicas (JSON no tiene `Infinity`). Lo lee `copy-limit.ts` de la frase que imprime el juego. Está en código y no en YAML porque es un conjunto cerrado de frases impresas, no una interpretación. `usableCopies()` del engine es el único lugar que decide cuántas copias usa el modelo (RN-15 a RN-17).
 
 ## 5. SOLID en este proyecto
 
@@ -128,7 +146,7 @@ Next.js con el App Router y **exportación estática**: `next build` genera HTML
 
 Los componentes reciben por *props* lo que muestran: `StepList` dibuja los pasos que le pasen, no sabe cuáles existen. Así se reutilizan en las pantallas de M3.
 
-En M3 el flujo será: la página descarga `data/out/cards.json` una vez por versión (y lo guarda en caché), el pool se importa en el navegador y el `engine` corre dentro de un Web Worker, para que la interfaz no se congele mientras calcula.
+En M3 el flujo será: la página descarga `data/out/cards.json` (y `names.es.json` si la lista está en español) una vez por versión y lo guarda en caché, el pool se importa en el navegador y el `engine` corre dentro de un Web Worker, para que la interfaz no se congele mientras calcula.
 
 ## 8. Cómo extender el proyecto
 
@@ -139,6 +157,8 @@ En M3 el flujo será: la página descarga `data/out/cards.json` una vez por vers
 | Un chequeo nuevo del validador | Un objeto `SemanticCheck` en `semantic-checks.ts`, agregado a `SEMANTIC_CHECKS`, con su test. |
 | Un tipo nuevo de archivo YAML | Su `.schema.json` y una ruta en `SCHEMA_ROUTES`. |
 | Un componente web | Una carpeta en `components/` con su `.tsx` y su `.css`. |
+| Corregir una carta puntual | Una entrada en `rules/overrides.yaml` con su `reason`. Si son varias cartas por la misma causa, corregir la regla. |
+| Aceptar listas en otro idioma | Agregar su código de Scryfall (`fr`, `pt`, `ja`…) a `NAME_INDEX_LANGUAGES` en `cli/fetch-data.ts`. |
 | Probar otro modelo de embeddings | Cambiar `semantic.model` en `model.yaml` y correr `pnpm data:embed`. Si el modelo no es compatible con transformers.js, escribir otro `Embedder`. |
 
 ## 9. Cómo leer el historial
@@ -151,3 +171,24 @@ git show <hash>        # el cambio completo con su explicación
 ```
 
 En VS Code, la vista **Source Control → Commits** (o la extensión GitLens) muestra lo mismo de forma visual.
+
+## 10. Decisiones medidas
+
+Algunas ideas suenan bien hasta que se miden. Esta sección guarda las que se descartaron o aplazaron, con los números, para no repetir la discusión.
+
+### No fragmentar `cards.json` por identidad de color (octubre de 2026)
+
+**La idea:** partir `cards.json` en 32 archivos, uno por identidad, para que quien busca comandantes Golgari descargue solo las cartas que caben en B/G.
+
+**La medición** (datos del 2026-10-06, tamaños comprimidos con gzip, que es como viajan):
+
+| Lo que se descarga | Tamaño |
+|---|---|
+| `cards.json` completo | 1,89 MB |
+| Cartas para una identidad de 2 colores | 0,67 MB |
+| Cartas para una identidad de 3 colores | 0,98 MB |
+| Índice mínimo de *todas* las cartas (nombre, id, identidad, legalidad) | 1,19 MB |
+
+**Por qué no:** el importador tiene que reconocer todo lo que el usuario pega, incluidas las cartas de otros colores, para reportarlas (RN-13) y para que el usuario pueda cambiar de identidad sin reimportar. Ese índice mínimo ya pesa 1,19 MB. Fragmentar daría 0,67 + 1,19 = 1,86 MB para dos colores: prácticamente lo mismo que el archivo completo, con dos descargas en vez de una. Además, `embeddings.json` apunta a las cartas por su posición en `cards.json`, y partirlo rompería ese contrato.
+
+**Qué sí conviene mirar en M3:** `embeddings.bin` pesa unos 4 MB (32 mil cartas × 128 bytes) y se comprime poco, porque son números sin repeticiones. Solo hacen falta los vectores de las cartas de la identidad elegida: para dos colores, poco más de un tercio. Si la carga inicial resulta lenta, lo que hay que fragmentar son los embeddings, no `cards.json`.

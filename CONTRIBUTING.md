@@ -38,6 +38,20 @@ Examples prove that a rule catches the cards you thought of; they don't show wha
 
 New themes go into `rules/vocabulary.yaml` first, in their own pull request.
 
+### When one card is wrong: overrides
+
+If a rule misreads a single card and there's no way to fix the rule without breaking others, add an override to `rules/overrides.yaml`:
+
+```yaml
+- card: "Some Card Name"           # English Oracle name, exactly as on Scryfall
+  remove: [counters]               # or "counters/gives", "tribal", "tribal:elf", a role id
+  add:
+    - { theme: sacrifice, provides: gives, weight: 0.8 }
+  reason: "The counters rule matches a poison counter, not +1/+1"
+```
+
+`reason` is mandatory and reviewed like code. Prefer fixing the rule whenever the mistake affects a family of cards (we fixed "target opponent may draw a card" in the draw rules instead of overriding Phelddagrif). `pnpm validate:rules` prints how many overrides each tag has collected, and `pnpm data:build` fails if an override names a card that doesn't exist.
+
 ## Changing model thresholds
 
 Every number lives in `model.yaml` (RN-23). A pull request that changes it must show how the reference-pool rankings move (RN-24). That check arrives in M2.
