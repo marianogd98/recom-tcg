@@ -11,6 +11,7 @@ import { join } from "node:path";
 import { readYaml, repoPaths } from "@recom-tcg/rules-schema";
 import type { Card } from "@recom-tcg/engine";
 import { loadRules } from "./rules/load.ts";
+import { YamlRuleSource } from "./rules/rule-source.ts";
 import { tagCard } from "./rules/apply.ts";
 import { toEngineCard, toRuleInput } from "./normalize.ts";
 import { NON_DECK_LAYOUTS, type ScryfallCard } from "./scryfall/types.ts";
@@ -23,7 +24,7 @@ const raw: ScryfallCard[] = JSON.parse(readFileSync(join(rawDir, "oracle-cards.j
 const commanderIds = new Set<string>(JSON.parse(readFileSync(join(rawDir, "commanders.json"), "utf8")));
 const meta = JSON.parse(readFileSync(join(rawDir, "meta.json"), "utf8")) as { updated_at: string };
 const model = readYaml<{ version: string }>(paths.model);
-const rules = loadRules(paths.rules);
+const rules = loadRules(new YamlRuleSource(paths.rules));
 
 const cards: Card[] = [];
 let skipped = 0;

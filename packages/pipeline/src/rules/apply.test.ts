@@ -4,12 +4,13 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { repoPaths } from "@recom-tcg/rules-schema";
 import { loadRules } from "./load.ts";
+import { YamlRuleSource } from "./rule-source.ts";
 import { tagCard } from "./apply.ts";
 import { toRuleInput } from "../normalize.ts";
 import type { ScryfallCard } from "../scryfall/types.ts";
 
 const paths = repoPaths(import.meta.dirname);
-const rules = loadRules(paths.rules);
+const rules = loadRules(new YamlRuleSource(paths.rules));
 const fixtures: ScryfallCard[] = JSON.parse(readFileSync(join(paths.root, "packages/pipeline/fixtures/cards.json"), "utf8"));
 const card = (name: string) => fixtures.find((c) => c.name === name)!;
 
