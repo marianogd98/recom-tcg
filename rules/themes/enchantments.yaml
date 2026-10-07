@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=../../packages/rules-schema/schemas/rule-file.schema.json
+schema_version: 1
+
+rules:
+  - id: enchantments.is-enchantment
+    theme: enchantments
+    provides: gives
+    weight: 0.5
+    match:
+      type_any: ['\benchantment\b']
+    examples:
+      match: [Glorious Anthem]
+      no_match: [Sol Ring]
+
+  - id: enchantments.payoff
+    theme: enchantments
+    provides: asks
+    weight: 1.0
+    match:
+      text_any:
+        - 'whenever (?:~ or )?(?:an|another) (?:nontoken )?enchantment (?:you control )?enters'
+        - 'whenever you cast an enchantment spell'
+        - 'for each enchantment you control'
+        - 'enchantment spells you cast cost'
+    examples:
+      match: [Eidolon of Blossoms, Argothian Enchantress]
+      no_match: [Glorious Anthem]

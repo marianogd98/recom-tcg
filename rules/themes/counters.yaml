@@ -1,0 +1,41 @@
+# yaml-language-server: $schema=../../packages/rules-schema/schemas/rule-file.schema.json
+schema_version: 1
+
+rules:
+  - id: counters.put
+    theme: counters
+    provides: gives
+    weight: 1.0
+    match:
+      text_any:
+        - 'put (?:a|an additional|one|two|three|x|that many|\d+) \+1/\+1 counters? on'
+        - 'enters with (?:a|an additional|one|two|three|x|that many|\d+) \+1/\+1 counters?'
+    examples:
+      match: [Travel Preparations, Ajani's Pridemate]
+      no_match: [Glorious Anthem]
+
+  - id: counters.keyword
+    theme: counters
+    provides: gives
+    weight: 0.8
+    match:
+      keywords_any:
+        - '^(?:evolve|bolster|adapt|support|training|mentor|outlast|modular|graft|fabricate|backup|reinforce|proliferate)$'
+    examples:
+      match: [Experiment One, Contagion Clasp]
+      no_match: [Llanowar Elves]
+
+  - id: counters.payoff
+    theme: counters
+    provides: asks
+    weight: 1.0
+    match:
+      text_any:
+        - 'if one or more \+1/\+1 counters would be put'
+        - 'whenever one or more \+1/\+1 counters are put'
+        - 'for each \+1/\+1 counter on'
+        - 'with (?:a|one or more) \+1/\+1 counters? on (?:it|them)'
+        - 'creatures? you control with \+1/\+1 counters'
+    examples:
+      match: [Hardened Scales, Corpsejack Menace]
+      no_match: [Glorious Anthem]

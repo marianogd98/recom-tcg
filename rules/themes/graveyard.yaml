@@ -1,0 +1,75 @@
+# yaml-language-server: $schema=../../packages/rules-schema/schemas/rule-file.schema.json
+schema_version: 1
+
+rules:
+  - id: graveyard.fill
+    theme: graveyard
+    provides: gives
+    weight: 0.7
+    match:
+      text_any:
+        - '\bmills? (?:a|one|two|three|four|five|six|seven|eight|ten|x|that many|\d+) cards?'
+        - 'put the top [^.]{0,30}cards? of your library into your graveyard'
+    examples:
+      match: [Stitcher's Supplier]
+      no_match: [Llanowar Elves]
+
+  - id: graveyard.surveil
+    theme: graveyard
+    provides: gives
+    weight: 0.5
+    match:
+      keywords_any:
+        - '^(?:surveil|dredge)$'
+    examples:
+      match: [Notion Rain]
+      no_match: [Llanowar Elves]
+
+  - id: graveyard.surveil-payoff
+    theme: graveyard
+    provides: asks
+    weight: 0.8
+    match:
+      text_any:
+        - 'whenever you surveil'
+        - 'whenever one or more (?:creature |land )?cards? (?:are put into|leave) your graveyard'
+    examples:
+      match: [Thoughtbound Phantasm]
+      no_match: [Notion Rain]
+
+  - id: graveyard.recursion
+    theme: graveyard
+    provides: asks
+    weight: 1.0
+    match:
+      text_any:
+        - 'return [^.]{0,60}cards? from your graveyard to (?:your hand|the battlefield)'
+        - 'from (?:a|your) graveyard onto the battlefield'
+        - '(?:cast|play) [^.]{0,40}from your graveyard'
+    examples:
+      match: [Eternal Witness, Reanimate]
+      no_match: [Llanowar Elves]
+
+  - id: graveyard.count
+    theme: graveyard
+    provides: asks
+    weight: 0.8
+    match:
+      text_any:
+        - 'for each (?:creature |land |instant and sorcery |instant or sorcery )?cards? in (?:your|all) graveyards?'
+        - '(?:four|five|seven|\d+) or more cards in your graveyard'
+        - 'card types among cards in (?:your|all) graveyards?'
+    examples:
+      match: [Golgari Grave-Troll]
+      no_match: [Llanowar Elves]
+
+  - id: graveyard.self-use
+    theme: graveyard
+    provides: asks
+    weight: 0.6
+    match:
+      keywords_any:
+        - '^(?:flashback|unearth|escape|embalm|eternalize|disturb|jump-start|retrace|scavenge|encore)$'
+    examples:
+      match: [Faithless Looting]
+      no_match: [Lightning Bolt]

@@ -1,6 +1,11 @@
 # yaml-language-server: $schema=../../packages/rules-schema/schemas/rule-file.schema.json
 schema_version: 1
 
+# A captured creature type must be a real type, not "creature", "nontoken"…
+# Each pattern starts the capture at a word boundary (\b) and puts a negative
+# lookahead (?!(?:...)\b) in front of it: colors, card types, land types and
+# words like "legendary" or "historic" are refused as a whole word. Without
+# the \b, "sorcery spells" was refused at "s" and then captured "orcery".
 rules:
   - id: tribal.lord
     theme: tribal
@@ -9,7 +14,31 @@ rules:
     capture: creature_type
     match:
       text_any:
-        - "other (?<creature_type>\\w+) creatures(?: you control)? get"
+        - 'other \b(?<creature_type>(?!(?:non\w*|creature|token|tapped|attacking|blocking|legendary|historic|outlaw|commander|modified|untapped|white|blue|black|red|green|colorless|multicolored|monocolored|artifact|enchantment|aura|equipment|vehicle|land|forest|island|swamp|mountain|plains|desert|gate|cave|shrine|planeswalker|instant|sorcery|spell|arcane|lesson|permanent|player|opponent|card|you|target|each|that|one|chosen|other)\b)\w+) creatures(?: you control)? get'
     examples:
       match: [Elvish Archdruid]
-      no_match: [Llanowar Elves]
+      no_match: [Llanowar Elves, Glorious Anthem]
+
+  - id: tribal.type-trigger
+    theme: tribal
+    provides: asks
+    weight: 1.0
+    capture: creature_type
+    match:
+      text_any:
+        - 'whenever (?:~ or )?(?:a|another) (?:nontoken )?\b(?<creature_type>(?!(?:non\w*|creature|token|tapped|attacking|blocking|legendary|historic|outlaw|commander|modified|untapped|white|blue|black|red|green|colorless|multicolored|monocolored|artifact|enchantment|aura|equipment|vehicle|land|forest|island|swamp|mountain|plains|desert|gate|cave|shrine|planeswalker|instant|sorcery|spell|arcane|lesson|permanent|player|opponent|card|you|target|each|that|one|chosen|other)\b)\w+) (?:you control )?(?:enters|dies|attacks)'
+    examples:
+      match: [Elvish Vanguard]
+      no_match: [Blood Artist]
+
+  - id: tribal.type-cost
+    theme: tribal
+    provides: asks
+    weight: 0.8
+    capture: creature_type
+    match:
+      text_any:
+        - '\b(?<creature_type>(?!(?:non\w*|creature|token|tapped|attacking|blocking|legendary|historic|outlaw|commander|modified|untapped|white|blue|black|red|green|colorless|multicolored|monocolored|artifact|enchantment|aura|equipment|vehicle|land|forest|island|swamp|mountain|plains|desert|gate|cave|shrine|planeswalker|instant|sorcery|spell|arcane|lesson|permanent|player|opponent|card|you|target|each|that|one|chosen|other)\b)\w+) spells you cast cost'
+    examples:
+      match: [Goblin Warchief]
+      no_match: [Lightning Bolt]

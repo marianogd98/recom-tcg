@@ -25,3 +25,26 @@ rules:
     examples:
       match: [Blood Artist, Zulaport Cutthroat]
       no_match: [Viscera Seer]
+
+  - id: sacrifice.additional-cost
+    theme: sacrifice
+    provides: gives
+    weight: 0.6
+    match:
+      text_any:
+        - 'additional cost to cast ~, sacrifice (?:a|an|another) (?:creature|artifact|permanent)'
+    examples:
+      match: [Fling]
+      no_match: [Lightning Bolt]
+
+  - id: sacrifice.whenever-you-sacrifice
+    theme: sacrifice
+    provides: asks
+    weight: 1.0
+    match:
+      text_any:
+        - 'whenever you sacrifice'
+    examples:
+      match: ["Korvold, Fae-Cursed King"]
+      no_match: [Viscera Seer]
+

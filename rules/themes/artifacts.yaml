@@ -1,0 +1,49 @@
+# yaml-language-server: $schema=../../packages/rules-schema/schemas/rule-file.schema.json
+schema_version: 1
+
+rules:
+  - id: artifacts.is-artifact
+    theme: artifacts
+    provides: gives
+    weight: 0.5
+    match:
+      type_any: ['\bartifact\b']
+    examples:
+      match: [Sol Ring]
+      no_match: [Llanowar Elves]
+
+  - id: artifacts.tokens
+    theme: artifacts
+    provides: gives
+    weight: 0.8
+    match:
+      text_any:
+        - 'create [^.]{0,40}\b(?:treasure|clue|food|thopter|servo|powerstone|gold|map|blood|junk|construct)\b[^.]{0,30}tokens?'
+    examples:
+      match: [Tireless Provisioner]
+      no_match: [Raise the Alarm]
+
+  - id: artifacts.payoff
+    theme: artifacts
+    provides: asks
+    weight: 1.0
+    match:
+      text_any:
+        - 'whenever (?:~ or )?(?:an|another|one or more) (?:nontoken )?artifacts? (?:you control )?(?:enters?|is put into|are put into)'
+        - 'for each artifact you control'
+        - 'artifact spells you cast cost'
+        - '(?:three|five) or more artifacts'
+        - 'whenever you cast an artifact spell'
+    examples:
+      match: [Reckless Fireweaver, Cranial Plating]
+      no_match: [Sol Ring]
+
+  - id: artifacts.keyword
+    theme: artifacts
+    provides: asks
+    weight: 0.7
+    match:
+      keywords_any: ['^(?:affinity|improvise|metalcraft)$']
+    examples:
+      match: [Frogmite]
+      no_match: [Sol Ring]
