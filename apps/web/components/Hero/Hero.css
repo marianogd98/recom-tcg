@@ -1,0 +1,22 @@
+.hero {
+  display: grid;
+  gap: 8px;
+}
+
+.hero__status {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.hero__title {
+  margin: 0;
+  font-size: 48px;
+}
+
+.hero__lead {
+  margin: 0;
+  max-width: 680px;
+  font-size: 18px;
+  color: var(--ink-muted);
+}

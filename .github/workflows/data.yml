@@ -17,7 +17,7 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       # Switch to --frozen-lockfile once pnpm-lock.yaml is committed.
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
       - run: pnpm validate:rules
       - name: Download Scryfall data
         run: pnpm data:fetch

@@ -14,7 +14,7 @@
   --ok-ink: #1f6b3a;
   --ok-soft: #e3f3e8;
 
-  /* Mana pips always carry their letter: color never travels alone. */
+  /* Mana pip colors, used by components/ManaPips. */
   --pip-w: #f3ebcb;
   --pip-u: #2f6fb0;
   --pip-b: #2a2a2e;
@@ -29,6 +29,9 @@
 
 body {
   margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   background: var(--ground);
   color: var(--ink);
   font-family: var(--font-sans), system-ui, sans-serif;
@@ -46,14 +49,12 @@ a:hover { color: #084f4f; }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
 .mono { font-family: var(--font-mono), ui-monospace, monospace; }
 
-.pip {
-  width: 22px; height: 22px; border-radius: 50%;
-  display: inline-flex; align-items: center; justify-content: center;
-  font: 600 11px var(--font-mono), monospace;
-  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.15);
+/* Main area of every page: fills the space above the footer. */
+.page {
+  flex: 1;
+  display: grid;
+  align-content: start;
+  gap: 32px;
+  padding-top: 56px;
+  padding-bottom: 56px;
 }
-.pip-W { background: var(--pip-w); color: #3a3320; }
-.pip-U { background: var(--pip-u); color: #fff; }
-.pip-B { background: var(--pip-b); color: #fff; }
-.pip-R { background: var(--pip-r); color: #fff; }
-.pip-G { background: var(--pip-g); color: #fff; }

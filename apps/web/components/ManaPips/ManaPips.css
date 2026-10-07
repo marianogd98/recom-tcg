@@ -1,0 +1,21 @@
+.mana-pips {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.mana-pip {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: 600 11px var(--font-mono), monospace;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.15);
+}
+
+.mana-pip--W { background: var(--pip-w); color: #3a3320; }
+.mana-pip--U { background: var(--pip-u); color: #fff; }
+.mana-pip--B { background: var(--pip-b); color: #fff; }
+.mana-pip--R { background: var(--pip-r); color: #fff; }
+.mana-pip--G { background: var(--pip-g); color: #fff; }

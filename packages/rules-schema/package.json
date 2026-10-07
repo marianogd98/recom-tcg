@@ -2,6 +2,7 @@
   "name": "@recom-tcg/rules-schema",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "description": "JSON Schemas for every YAML file contributors edit, plus the validator CI runs.",
   "type": "module",
   "exports": {

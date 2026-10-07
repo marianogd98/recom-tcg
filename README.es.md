@@ -34,7 +34,13 @@ pnpm data:fetch       # descarga los datos de Scryfall en data/raw/
 pnpm data:build       # genera los datos etiquetados en data/out/
 ```
 
+Cómo está construido por dentro, y las convenciones de Clean Code y SOLID que sigue el código: [`docs/arquitectura.md`](docs/arquitectura.md).
+
 La estructura del repositorio, la hoja de ruta y la guía de contribución están en el [README en inglés](README.md) y en [CONTRIBUTING.md](CONTRIBUTING.md). Las contribuciones en español son bienvenidas.
+
+## Licencia
+
+[MIT](LICENSE). Cubre el código y la documentación del proyecto, no el contenido de Magic: The Gathering ni los datos de Scryfall.
 
 ---
 

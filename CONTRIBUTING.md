@@ -35,6 +35,10 @@ New themes go into `rules/vocabulary.yaml` first, in their own pull request.
 
 Every number lives in `model.yaml` (RN-23). A pull request that changes it must show how the reference-pool rankings move (RN-24). That check arrives in M2.
 
+## Code conventions
+
+Code follows the Clean Code and SOLID conventions described in [`docs/arquitectura.md`](docs/arquitectura.md): pure functions where possible, I/O only at the edges (`cli/`, `storage/`, `scryfall/`), one responsibility per module, and one commit per change with the *why* in its message.
+
 ## Before opening a pull request
 
 ```bash

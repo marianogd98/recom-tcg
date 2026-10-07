@@ -2,6 +2,7 @@
   "name": "recom-tcg",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "description": "Discover which commanders in your own card pool make the most of the rest of your collection.",
   "packageManager": "pnpm@10.28.0",
   "engines": {
