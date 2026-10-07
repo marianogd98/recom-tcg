@@ -1,0 +1,88 @@
+# yaml-language-server: $schema=../../packages/rules-schema/schemas/rule-file.schema.json
+schema_version: 1
+
+# "(?! you control)" keeps blink effects ("exile target creature you
+# control, then return it") out of removal.
+rules:
+  - id: removal.destroy-exile-creature
+    role: removal_creature
+    weight: 1.0
+    match:
+      text_any:
+        - '(?:destroy|exile) target (?:[a-z-]+ )?(?:creature|permanent)(?! you control)(?! card)'
+    examples:
+      match: [Swords to Plowshares, Doom Blade, Vindicate]
+      no_match: [Cloudshift]
+
+  - id: removal.damage
+    role: removal_creature
+    weight: 0.8
+    match:
+      text_any:
+        - 'deals? (?:\d+|x) damage to (?:any target|target creature|target attacking|target blocking)'
+    examples:
+      match: [Lightning Bolt, Flame Slash]
+      no_match: [Opt]
+
+  - id: removal.shrink
+    role: removal_creature
+    weight: 0.8
+    match:
+      text_any:
+        - 'target creature (?:an opponent controls )?gets -(?:\d+|x)/-(?:\d+|x)'
+    examples:
+      match: [Disfigure]
+      no_match: [Opt]
+
+  - id: removal.edict
+    role: removal_creature
+    weight: 0.8
+    match:
+      text_any:
+        - '(?:target player|target opponent|each opponent) sacrifices (?:a|an) (?:creature|nonland permanent|attacking creature|creature or planeswalker)'
+    examples:
+      match: [Diabolic Edict]
+      no_match: [Viscera Seer]
+
+  - id: removal.fight
+    role: removal_creature
+    weight: 0.7
+    match:
+      text_any:
+        - 'fights? (?:target|another target|up to one target) creature'
+        - 'deals damage equal to its power to (?:target|another target|up to one target) creature'
+    examples:
+      match: [Prey Upon]
+      no_match: [Llanowar Elves]
+
+  - id: removal.bounce
+    role: removal_creature
+    weight: 0.5
+    match:
+      text_any:
+        - "return target (?:creature|nonland permanent|permanent)(?! you control) to its owner's hand"
+    examples:
+      match: [Unsummon]
+      no_match: [Cloudshift]
+
+  - id: removal.pacifism
+    role: removal_creature
+    weight: 0.7
+    match:
+      type_any: ['\baura\b']
+      text_any:
+        - "enchanted creature can't attack or block"
+        - "enchanted creature can't attack, block"
+    examples:
+      match: [Pacifism]
+      no_match: [Rancor]
+
+  - id: removal.artifact-enchantment
+    role: removal_artifact_enchantment
+    weight: 1.0
+    match:
+      text_any:
+        - '(?:destroy|exile) target (?:artifact|enchantment|artifact or enchantment|nonland permanent|permanent|noncreature permanent|nonland, noncreature permanent)(?! you control)'
+    examples:
+      match: [Naturalize, Disenchant, Vindicate]
+      no_match: [Doom Blade]

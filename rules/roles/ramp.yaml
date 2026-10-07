@@ -6,19 +6,42 @@ rules:
     role: ramp
     weight: 1.0
     match:
-      type_any: [Creature]
+      type_any: ['\bcreature\b']
       text_any:
-        - "\\{t\\}: add \\{[wubrgc]\\}"
+        - '\{t\}: add '
     examples:
-      match: [Llanowar Elves]
+      match: [Llanowar Elves, Birds of Paradise]
       no_match: [Viscera Seer]
+
+  - id: ramp.mana-rock
+    role: ramp
+    weight: 1.0
+    match:
+      type_any: ['\bartifact\b']
+      type_none: ['\bcreature\b', '\bland\b']
+      text_any:
+        - '\{t\}: add '
+    examples:
+      match: [Sol Ring, Arcane Signet]
+      no_match: [Bonesplitter]
 
   - id: ramp.land-search
     role: ramp
     weight: 1.0
     match:
       text_any:
-        - "search your library for (?:a|up to two) basic land cards?.{0,80}onto the battlefield"
+        - 'search your library for (?:a|up to two|two) basic land cards?[^.]{0,80}onto the battlefield'
     examples:
-      match: [Sakura-Tribe Elder]
+      match: [Sakura-Tribe Elder, Cultivate]
       no_match: [Blood Artist]
+
+  - id: ramp.extra-land
+    role: ramp
+    weight: 0.8
+    match:
+      text_any:
+        - 'you may play (?:an|two) additional lands?'
+        - 'put a land card from your hand onto the battlefield'
+    examples:
+      match: [Exploration]
+      no_match: [Sol Ring]
