@@ -52,6 +52,29 @@ If a rule misreads a single card and there's no way to fix the rule without brea
 
 `reason` is mandatory and reviewed like code. Prefer fixing the rule whenever the mistake affects a family of cards (we fixed "target opponent may draw a card" in the draw rules instead of overriding Phelddagrif). `pnpm validate:rules` prints how many overrides each tag has collected, and `pnpm data:build` fails if an override names a card that doesn't exist.
 
+## Supporting another collection app
+
+Imports read CSV exports through the profiles in `import-profiles/`, one YAML file per app (RN-14):
+
+```yaml
+id: manabox
+detect:
+  header_contains: ["Name", "Set code", "Quantity", "Scryfall ID"]  # all must be in the header
+columns:
+  name: "Name"
+  quantity: "Quantity"
+  oracle_id: "Oracle ID"   # optional: identifies the card without reading its name
+```
+
+When several profiles match a header, the one listing more columns wins, so put enough columns in `detect` to tell your app apart. Try it with a real export:
+
+```bash
+pnpm data:build                          # once, to ship the profile to data/out/
+pnpm pool:import data/pools/my-export.csv
+```
+
+`data/pools/` is git-ignored: your collection never ends up in a commit.
+
 ## Changing model thresholds
 
 Every number lives in `model.yaml` (RN-23). A pull request that changes it must show how the reference-pool rankings move (RN-24). That check arrives in M2.
