@@ -1,0 +1,27 @@
+.step-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.step-list__item {
+  display: grid;
+  gap: 6px;
+}
+
+.step-list__number {
+  color: var(--ink-muted);
+}
+
+.step-list__title {
+  margin: 0;
+  font-size: 20px;
+}
+
+.step-list__description {
+  margin: 0;
+  color: var(--ink-muted);
+}
