@@ -831,6 +831,23 @@
     }
   },
   {
+    "oracle_id": "d0e99535-0ea0-4aa5-99f5-6c5255b27c38",
+    "name": "Phelddagrif",
+    "layout": "normal",
+    "cmc": 4,
+    "type_line": "Legendary Creature — Phelddagrif",
+    "oracle_text": "{G}: Phelddagrif gains trample until end of turn. Target opponent creates a 1/1 green Hippo creature token.\n{W}: Phelddagrif gains flying until end of turn. Target opponent gains 2 life.\n{U}: Return Phelddagrif to its owner's hand. Target opponent may draw a card.",
+    "color_identity": [
+      "G",
+      "U",
+      "W"
+    ],
+    "keywords": [],
+    "legalities": {
+      "commander": "legal"
+    }
+  },
+  {
     "oracle_id": "b3c12848-528d-4005-878f-4f950a07240a",
     "name": "Prey Upon",
     "layout": "normal",

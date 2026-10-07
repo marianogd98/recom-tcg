@@ -1,13 +1,17 @@
 # yaml-language-server: $schema=../../packages/rules-schema/schemas/rule-file.schema.json
 schema_version: 1
 
+# "(?<!opponents? (?:may )?)" is a lookbehind: it refuses a match when the
+# words right before are "opponent", "opponents" or "opponent may". Cards
+# like Phelddagrif let an opponent draw, which is not card advantage for you.
+# "target player draws" stays in: you usually aim it at yourself.
 rules:
   - id: draw.multiple
     role: draw
     weight: 1.0
     match:
       text_any:
-        - 'draws? (?:two|three|four|five|seven|x|that many|\d+) cards'
+        - '(?<!opponents? (?:may )?)\bdraws? (?:two|three|four|five|seven|x|that many|\d+) cards'
     examples:
       match: [Harmonize, Night's Whisper]
       no_match: [Lightning Bolt]
@@ -17,7 +21,7 @@ rules:
     weight: 0.9
     match:
       text_any:
-        - 'whenever [^.]{0,80}, (?:you )?(?:may )?draw (?:a|two) cards?'
+        - 'whenever [^.]{0,80}, (?:you )?(?:may )?(?<!opponents? (?:may )?)draw (?:a|two) cards?'
     examples:
       match: [Argothian Enchantress, Eidolon of Blossoms]
       no_match: [Lightning Bolt]
@@ -27,10 +31,10 @@ rules:
     weight: 0.5
     match:
       text_any:
-        - '\bdraw a card'
+        - '(?<!opponents? (?:may )?)\bdraw a card'
     examples:
       match: [Opt]
-      no_match: [Lightning Bolt]
+      no_match: [Lightning Bolt, Phelddagrif]
 
   - id: draw.impulse
     role: draw
