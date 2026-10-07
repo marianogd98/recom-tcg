@@ -40,6 +40,8 @@ export interface ImportResult {
   format: ImportFormat;
   /** One entry per card, quantities added up across printings (RN-10). */
   pool: PoolEntry[];
+  /** Distinct banned cards kept out of the pool; the candidate search mentions banned commanders (RN-02). */
+  banned: string[];
   lines: ImportLineResult[];
   summary: ImportSummary;
 }
@@ -66,7 +68,8 @@ export function importPool(input: string, context: ImportContext, options: Impor
     }
   }
   const pool = [...quantities].map(([oracleId, quantity]) => ({ oracleId, quantity }));
-  return { format, pool, lines, summary: summarize(lines, pool) };
+  const banned = [...new Set(lines.filter((line) => line.excluded === "banned").map((line) => line.oracleId!))];
+  return { format, pool, banned, lines, summary: summarize(lines, pool) };
 }
 
 function readInput(input: string, profiles: readonly ImportProfile[]): { format: ImportFormat; lines: ImportedLine[] } {
