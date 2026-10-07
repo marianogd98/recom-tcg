@@ -9,6 +9,8 @@ apps/web/next-env.d.ts
 # Data pipeline: raw downloads and generated artifacts are rebuilt by CI
 data/raw/
 data/out/
+# Your own collection exports for `pnpm pool:import`: never committed (RN-20)
+data/pools/
 
 # Misc
 *.log
