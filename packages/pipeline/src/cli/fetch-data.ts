@@ -19,6 +19,9 @@ const USER_AGENT = "ReComTCG/0.1 (+https://github.com/marianogd98/recom-tcg)";
  */
 const NAME_INDEX_LANGUAGES = ["es"];
 
+/** Banned cards that would otherwise be commanders: legendary creatures and "can be your commander". */
+const BANNED_COMMANDERS_QUERY = 'banned:commander (t:legendary t:creature OR o:"can be your commander")';
+
 async function main(): Promise<void> {
   const scryfall = new ScryfallClient({ userAgent: USER_AGENT });
   const store = new RawDataStore(repoPaths(import.meta.dirname).rawData);
@@ -28,7 +31,12 @@ async function main(): Promise<void> {
   store.saveOracleCards(await scryfall.download(bulk.downloadUri), bulk.format);
 
   console.log("Fetching is:commander…");
-  const commanderIds = await scryfall.searchOracleIds("is:commander");
+  // Scryfall's is:commander leaves banned cards out, but RN-02 must still
+  // recognize a banned commander to explain why it is not offered. Those
+  // join the list; legality alone keeps them from becoming candidates.
+  const eligible = await scryfall.searchOracleIds("is:commander");
+  const banned = await scryfall.searchOracleIds(BANNED_COMMANDERS_QUERY);
+  const commanderIds = [...new Set([...eligible, ...banned])].sort();
   store.saveCommanderIds(commanderIds);
 
   for (const lang of NAME_INDEX_LANGUAGES) {
@@ -40,7 +48,7 @@ async function main(): Promise<void> {
 
   store.saveMeta({ updatedAt: bulk.updatedAt, format: bulk.format });
 
-  console.log(`✓ ${commanderIds.length} commander-eligible cards · data ${bulk.updatedAt}`);
+  console.log(`✓ ${eligible.length} commander-eligible cards (+${banned.length} banned) · data ${bulk.updatedAt}`);
 }
 
 main().catch((error) => {
