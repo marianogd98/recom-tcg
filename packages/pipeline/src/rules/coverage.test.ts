@@ -4,7 +4,7 @@ import { compileRule } from "./compile.ts";
 import { measureCoverage } from "./coverage.ts";
 import type { RuleInput } from "./rule-input.ts";
 
-const input = (text: string): RuleInput => ({ faces: [text], typeLine: "Creature", keywords: [], producesMana: false });
+const input = (text: string): RuleInput => ({ faces: [text], typeLine: "Creature", keywords: [], producesMana: false, producedColors: [] });
 const cards = [
   { name: "A", input: input("sacrifice a creature: scry 1.") },
   { name: "B", input: input("{t}: add {g}.") },

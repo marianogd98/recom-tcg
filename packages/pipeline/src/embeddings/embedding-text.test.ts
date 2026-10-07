@@ -7,7 +7,8 @@ test("type line first, then each face; the card's own name is already ~", () => 
     faces: ["whenever ~ or another creature dies, target player loses 1 life."],
     typeLine: "Creature — Vampire",
     keywords: [],
-    producesMana: false
+    producesMana: false,
+    producedColors: []
   });
   assert.equal(text, "creature — vampire\nwhenever ~ or another creature dies, target player loses 1 life.");
 });

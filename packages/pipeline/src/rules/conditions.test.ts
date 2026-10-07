@@ -27,6 +27,7 @@ const card = (faces: string[], typeLine = "Creature — Elf", extra: Partial<Rul
   typeLine,
   keywords: [],
   producesMana: false,
+  producedColors: [],
   ...extra
 });
 
@@ -48,6 +49,12 @@ test("card conditions gate the whole card", () => {
   assert.ok(matchRule(card([""], "Artifact", { producesMana: true }), compiled) !== null);
   assert.ok(matchRule(card([""], "Artifact"), compiled) === null);
   assert.ok(matchRule(card([""], "Creature", { producesMana: true }), compiled) === null);
+});
+
+test("produces_colors_min counts distinct colors of mana (fixing)", () => {
+  const compiled = compileRule(rule({ produces_colors_min: 2 }), macros);
+  assert.ok(matchRule(card([""], "Land", { producedColors: ["G", "U"] }), compiled) !== null);
+  assert.ok(matchRule(card([""], "Artifact", { producedColors: ["G", "G"] }), compiled) === null);
 });
 
 test("capture returns the named group", () => {

@@ -61,6 +61,11 @@ export const CARD_CONDITIONS: Readonly<Record<string, Factory<CardCondition>>> =
   produces_mana(value) {
     const expected = value as boolean;
     return { operator: "produces_mana", test: (card) => card.producesMana === expected };
+  },
+  /** Fixing: the card can make mana of at least this many different colors. */
+  produces_colors_min(value) {
+    const minimum = value as number;
+    return { operator: "produces_colors_min", test: (card) => new Set(card.producedColors).size >= minimum };
   }
 };
 

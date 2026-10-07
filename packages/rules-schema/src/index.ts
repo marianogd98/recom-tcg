@@ -19,6 +19,7 @@ export interface RuleDefinition {
     type_none?: string[];
     keywords_any?: string[];
     produces_mana?: boolean;
+    produces_colors_min?: number;
   };
   examples: { match: string[]; no_match?: string[] };
 }
