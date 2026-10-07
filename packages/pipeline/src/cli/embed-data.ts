@@ -1,7 +1,7 @@
 /**
  * `pnpm data:embed` — semantic artifacts for the browser (RN-25, RN-26).
- * Run `pnpm data:fetch` first. The first run downloads the model
- * (~25 MB) into .cache/models; later runs reuse it.
+ * Run `pnpm data:fetch` first. The first run downloads the model into
+ * .cache/models; later runs reuse it.
  */
 import { join } from "node:path";
 import { readYaml, repoPaths } from "@recom-tcg/rules-schema";

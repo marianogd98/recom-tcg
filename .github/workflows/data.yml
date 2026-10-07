@@ -16,13 +16,20 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: pnpm
-      # Switch to --frozen-lockfile once pnpm-lock.yaml is committed.
       - run: pnpm install --frozen-lockfile
       - run: pnpm validate:rules
       - name: Download Scryfall data
         run: pnpm data:fetch
       - name: Build artifacts
         run: pnpm data:build
+      # The embedding model is downloaded once and reused while
+      # model.yaml does not change.
+      - uses: actions/cache@v4
+        with:
+          path: .cache/models
+          key: models-${{ hashFiles('model.yaml') }}
+      - name: Semantic embeddings (RN-26)
+        run: pnpm data:embed
       - uses: actions/upload-artifact@v4
         with:
           name: card-data
