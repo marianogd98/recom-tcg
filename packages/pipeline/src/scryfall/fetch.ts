@@ -17,7 +17,7 @@ const rawDir = resolve(here, "../../../../data/raw");
 const API = "https://api.scryfall.com";
 const HEADERS = {
   // Replace <owner> once the repository is public.
-  "User-Agent": "ReComTCG/0.1 (+https://github.com/<owner>/recom-tcg)",
+  "User-Agent": "ReComTCG/0.1 (+https://github.com/marianogd98/recom-tcg)",
   Accept: "application/json;q=0.9,*/*;q=0.8"
 };
 
