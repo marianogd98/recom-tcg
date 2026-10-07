@@ -10,6 +10,7 @@ export const REPO_LAYOUT = {
   model: "model.yaml",
   rules: "rules",
   vocabulary: "rules/vocabulary.yaml",
+  overrides: "rules/overrides.yaml",
   importProfiles: "import-profiles",
   rawData: "data/raw",
   outData: "data/out"

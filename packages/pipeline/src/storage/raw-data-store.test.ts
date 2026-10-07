@@ -34,3 +34,23 @@ test("data fetched before JSON Lines (no format in meta) is read as a JSON array
     assert.equal(new RawDataStore(dir).load().oracleCards.length, 1);
   });
 });
+
+test("localized names are saved per language and found again on load (RN-11)", () => {
+  withTempDir((dir) => {
+    const store = new RawDataStore(dir);
+    store.saveOracleCards(new TextEncoder().encode(""), "jsonl");
+    store.saveCommanderIds([]);
+    store.saveMeta({ updatedAt: "2026-10-06T21:01:59Z", format: "jsonl" });
+    store.saveLocalizedNames("es", [{ name: "Elfos de Llanowar", oracleId: "elves" }]);
+    assert.deepEqual(store.load().localizedNames, { es: [{ name: "Elfos de Llanowar", oracleId: "elves" }] });
+  });
+});
+
+test("data fetched before the name index has no localized names", () => {
+  withTempDir((dir) => {
+    writeFileSync(join(dir, "oracle-cards.json"), "[]");
+    writeFileSync(join(dir, "commanders.json"), "[]");
+    writeFileSync(join(dir, "meta.json"), '{"updated_at":"2026-10-01T00:00:00Z"}');
+    assert.deepEqual(new RawDataStore(dir).load().localizedNames, {});
+  });
+});

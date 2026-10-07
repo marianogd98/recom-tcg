@@ -90,3 +90,21 @@ test("HTTP errors stop the run with a clear message", async () => {
   const client = new ScryfallClient({ userAgent: "test", fetchFn, sleep: noWait });
   await assert.rejects(client.oracleBulkFile(), /404 Not Found/);
 });
+
+test("localized printings: one search per language, every printing, every page (RN-11)", async () => {
+  const first = `${ScryfallClient.API_URL}/cards/search?q=lang%3Aes&unique=prints&include_multilingual=true`;
+  const { fetchFn, requests } = fakeScryfall({
+    [first]: { data: [{ name: "Llanowar Elves", printed_name: "Elfos de Llanowar", lang: "es" }], has_more: true, next_page: "page-2" },
+    "page-2": { data: [{ name: "Sol Ring", printed_name: "Anillo solar", lang: "es" }], has_more: false }
+  });
+  const client = new ScryfallClient({ userAgent: "test", fetchFn, sleep: noWait });
+  const printings = await client.localizedPrintings("es");
+  assert.deepEqual(printings.map((card) => card.printed_name), ["Elfos de Llanowar", "Anillo solar"]);
+  assert.equal(requests.length, 2);
+});
+
+test("a search with no results is empty, not an error (Scryfall answers 404)", async () => {
+  const { fetchFn } = fakeScryfall({});
+  const client = new ScryfallClient({ userAgent: "test", fetchFn, sleep: noWait });
+  assert.deepEqual(await client.searchOracleIds("is:commander"), []);
+});

@@ -1,11 +1,19 @@
 # yaml-language-server: $schema=../packages/rules-schema/schemas/overrides.schema.json
-# Card-by-card corrections. They only add or remove tags, never scores.
-# `reason` is mandatory and every override is reviewed in its pull request.
+# Card-by-card corrections (gramática YAML §3.8). They only add or remove
+# tags, never scores. `reason` is mandatory and every override is reviewed
+# in its pull request.
+#
+# Before writing one, ask whether the rule is wrong for a whole family of
+# cards. If so, fix the rule (pnpm rules:report shows what it catches).
+# `pnpm validate:rules` prints how many overrides each tag collects: a tag
+# with many of them is a rule waiting to be rewritten.
+#
+#  - card: "Some Card Name"       # English Oracle name; the build fails if it doesn't exist
+#    remove: [counters]           # also "counters/gives", "tribal" (all tribal:*), "tribal:elf", or a role id
+#    add:
+#      - { theme: sacrifice, provides: gives, weight: 0.8 }
+#      - { role: draw, weight: 0.5 }  # replaces the rule's tag if it already has one
+#    reason: "The counters rule matches a poison counter, not +1/+1"
 schema_version: 1
 
 overrides: []
-# Example:
-#  - card: "Some Card Name"
-#    add:    [{ theme: sacrifice, provides: gives, weight: 0.8 }]
-#    remove: [counters]
-#    reason: "The counters rule matches a poison counter, not +1/+1"

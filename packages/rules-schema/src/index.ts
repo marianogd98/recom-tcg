@@ -29,6 +29,24 @@ export interface RuleFile {
   rules: RuleDefinition[];
 }
 
+/** A tag an override adds: a theme with its direction, or a role (gramática YAML §3.8). */
+export type OverrideTag = { theme: string; provides: Provides; weight: number } | { role: string; weight: number };
+
+/** One hand-written correction from rules/overrides.yaml. */
+export interface OverrideDefinition {
+  /** English Oracle name, exactly as Scryfall writes it. */
+  card: string;
+  add?: OverrideTag[];
+  /** "counters", "counters/gives", "tribal:elf", "tribal" (every tribal tag) or a role id. */
+  remove?: string[];
+  reason: string;
+}
+
+export interface OverridesFile {
+  schema_version: 1;
+  overrides: OverrideDefinition[];
+}
+
 export interface Vocabulary {
   schema_version: 1;
   themes: { id: string; description: string; parameterized?: boolean }[];
@@ -59,3 +77,4 @@ export function compilePattern(pattern: string, macros: Record<string, string>):
 }
 
 export { REPO_LAYOUT, findRepoRoot, repoPaths, type RepoPaths } from "./repo.ts";
+export { parseTagSelector, selectsRole, selectsTheme, type TagSelector } from "./tag-selector.ts";

@@ -1,6 +1,7 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseBulkCards, type BulkFormat } from "../scryfall/bulk-file.ts";
+import type { LocalizedName } from "../scryfall/localized-names.ts";
 import type { ScryfallCard } from "../scryfall/types.ts";
 
 /** What `data:fetch` downloads and `data:build` reads. */
@@ -10,6 +11,8 @@ export interface RawData {
   commanderIds: string[];
   /** Date of the bulk file, stamped on every result (RN-21). */
   updatedAt: string;
+  /** Printed translations by language code, e.g. { es: [...] } (RN-11). Empty if none were fetched. */
+  localizedNames: Record<string, LocalizedName[]>;
 }
 
 /** Saved next to the downloads: when the bulk file was made and how to read it. */
@@ -26,8 +29,11 @@ export class RawDataStore {
   private static readonly FILES = {
     oracleCards: { json: "oracle-cards.json", jsonl: "oracle-cards.jsonl" },
     commanderIds: "commanders.json",
-    meta: "meta.json"
+    meta: "meta.json",
+    localizedNames: (lang: string) => `names-${lang}.json`
   } as const;
+
+  private static readonly LOCALIZED_NAMES_FILE = /^names-([a-z]+)\.json$/;
 
   constructor(private readonly dir: string) {}
 
@@ -38,6 +44,10 @@ export class RawDataStore {
 
   saveCommanderIds(ids: string[]): void {
     this.write(RawDataStore.FILES.commanderIds, JSON.stringify(ids));
+  }
+
+  saveLocalizedNames(lang: string, names: LocalizedName[]): void {
+    this.write(RawDataStore.FILES.localizedNames(lang), JSON.stringify(names));
   }
 
   saveMeta(meta: RawMeta): void {
@@ -51,8 +61,19 @@ export class RawDataStore {
     return {
       oracleCards: parseBulkCards(this.readText(RawDataStore.FILES.oracleCards[format]), format),
       commanderIds: this.readJson<string[]>(RawDataStore.FILES.commanderIds),
-      updatedAt: meta.updated_at
+      updatedAt: meta.updated_at,
+      localizedNames: this.loadLocalizedNames()
     };
+  }
+
+  /** Every names-<lang>.json present. Data fetched before RN-11 simply has none. */
+  private loadLocalizedNames(): Record<string, LocalizedName[]> {
+    if (!existsSync(this.dir)) return {};
+    const entries = readdirSync(this.dir).flatMap((file) => {
+      const lang = RawDataStore.LOCALIZED_NAMES_FILE.exec(file)?.[1];
+      return lang ? [[lang, this.readJson<LocalizedName[]>(file)] as const] : [];
+    });
+    return Object.fromEntries(entries);
   }
 
   private write(file: string, content: string | Uint8Array): void {

@@ -9,6 +9,7 @@
  * real pagination logic against a fake server, instantly and offline.
  */
 import { inflateIfGzip, type BulkFormat } from "./bulk-file.ts";
+import type { ScryfallCard } from "./types.ts";
 
 export type FetchFn = (url: string, init?: RequestInit) => Promise<Response>;
 
@@ -41,11 +42,14 @@ interface BulkList {
   data: BulkItem[];
 }
 
-interface SearchPage {
-  data: { oracle_id?: string }[];
+interface SearchPage<T> {
+  data: T[];
   has_more: boolean;
   next_page?: string;
 }
+
+/** "cards" = one result per card; "prints" = one per printing (each language edition counts). */
+type Unique = "cards" | "prints";
 
 export class ScryfallClient {
   static readonly API_URL = "https://api.scryfall.com";
@@ -89,15 +93,37 @@ export class ScryfallClient {
 
   /** Every oracle_id returned by a search, following all result pages. */
   async searchOracleIds(query: string): Promise<string[]> {
-    const ids = new Set<string>();
-    let url: string | undefined = `${ScryfallClient.API_URL}/cards/search?q=${encodeURIComponent(query)}&unique=cards`;
+    const cards = await this.searchAll<{ oracle_id?: string }>(query, "cards");
+    return [...new Set(cards.flatMap((card) => (card.oracle_id ? [card.oracle_id] : [])))].sort();
+  }
+
+  /**
+   * Every printing in one language, e.g. "es" (RN-11). Each printing is
+   * fetched because a card's translation sometimes changed between sets,
+   * and a player's list may use any of them.
+   */
+  async localizedPrintings(lang: string): Promise<ScryfallCard[]> {
+    return this.searchAll<ScryfallCard>(`lang:${lang}`, "prints", { include_multilingual: "true" });
+  }
+
+  /**
+   * Follows every result page of a search. Scryfall answers 404 when
+   * nothing matches; that is an empty result, not an error.
+   */
+  private async searchAll<T>(query: string, unique: Unique, extra: Record<string, string> = {}): Promise<T[]> {
+    const params = new URLSearchParams({ q: query, unique, ...extra });
+    let url: string | undefined = `${ScryfallClient.API_URL}/cards/search?${params.toString().replace(/\+/g, "%20")}`;
+    const results: T[] = [];
     while (url) {
       await this.sleep(this.requestDelayMs);
-      const page: SearchPage = await this.getJson<SearchPage>(url);
-      for (const card of page.data) if (card.oracle_id) ids.add(card.oracle_id);
+      const response = await this.fetchFn(url, { headers: this.headers });
+      if (response.status === 404 && results.length === 0) return [];
+      if (!response.ok) throw new Error(`GET ${url} → ${response.status} ${response.statusText}`);
+      const page = (await response.json()) as SearchPage<T>;
+      results.push(...page.data);
       url = page.has_more ? page.next_page : undefined;
     }
-    return [...ids].sort();
+    return results;
   }
 
   private async getJson<T>(url: string): Promise<T> {

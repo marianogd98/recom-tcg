@@ -2,6 +2,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Card } from "@recom-tcg/engine";
 import type { Manifest } from "../build/build-card-data.ts";
+import type { NameIndex } from "../build/build-name-index.ts";
 import type { EmbeddingArtifacts } from "../embeddings/build-embeddings.ts";
 
 /** Writes the files the browser downloads into data/out/. */
@@ -11,6 +12,11 @@ export class ArtifactStore {
   save(cards: Card[], manifest: Manifest): void {
     this.write("cards.json", JSON.stringify(cards));
     this.write("manifest.json", JSON.stringify(manifest, null, 2));
+  }
+
+  /** names.es.json and friends: what the importer reads to accept lists in other languages (RN-11). */
+  saveNameIndex(lang: string, index: NameIndex): void {
+    this.write(`names.${lang}.json`, JSON.stringify(index));
   }
 
   /**
