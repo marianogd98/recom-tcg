@@ -47,9 +47,10 @@ export function buildCardData({ rawCards, commanderIds, rules, overrides = [] }:
   const overrideByCard = new Map(overrides.map((override) => [override.card, override]));
 
   const cards = deckCards.map((raw) => {
-    const ruleTags = tagCard(toRuleInput(raw), rules);
+    const input = toRuleInput(raw);
+    const ruleTags = tagCard(input, rules);
     const override = overrideByCard.get(raw.name);
-    return { ...toEngineCard(raw, commanderIds), ...(override ? applyOverride(ruleTags, override) : ruleTags) };
+    return { ...toEngineCard(raw, commanderIds, input), ...(override ? applyOverride(ruleTags, override) : ruleTags) };
   });
 
   const names = new Set(deckCards.map((card) => card.name));

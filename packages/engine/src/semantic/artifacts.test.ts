@@ -12,7 +12,7 @@ const card = (oracleId: string, legality: Card["legality"] = "legal"): Card => (
   keywords: [],
   legality,
   canBeCommander: false,
-  copyLimit: null,
+  copyLimit: 1,
   landValue: 0,
   themes: [],
   roles: []

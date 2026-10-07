@@ -43,13 +43,19 @@ export interface Card {
   legality: "legal" | "banned" | "not_legal" | "restricted";
   /** True when Scryfall's is:commander includes it (RN-01). */
   canBeCommander: boolean;
-  /** Number of copies allowed in a deck when the card overrides singleton (RN-16). null = singleton. */
-  copyLimit: number | null;
+  /**
+   * Copies a deck may hold (RN-16): 1 for almost every card, a number for
+   * cards like Seven Dwarves, "any" for Relentless Rats and basic lands.
+   */
+  copyLimit: CopyLimit;
   /** 0.5 for modal double-faced cards with a land back face (RN-47). */
   landValue: number;
   themes: ThemeTag[];
   roles: RoleTag[];
 }
+
+/** How many copies of a card a deck may hold. "any" cannot be a number: JSON has no Infinity. */
+export type CopyLimit = number | "any";
 
 /** A line of the user's pool after normalization (bloque 2). */
 export interface PoolEntry {

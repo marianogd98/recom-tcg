@@ -1,6 +1,7 @@
 import { normalizeOracleText, type Card, type Color } from "@recom-tcg/engine";
 import type { ScryfallCard } from "./scryfall/types.ts";
 import type { RuleInput } from "./rules/rule-input.ts";
+import { copyLimitOf } from "./copy-limit.ts";
 
 const COLORS = new Set(["W", "U", "B", "R", "G"]);
 
@@ -33,8 +34,15 @@ export function landValue(card: ScryfallCard): number {
 
 const LEGALITY = new Set(["legal", "banned", "not_legal", "restricted"]);
 
-/** Converts a Scryfall card into the engine's Card, without tags. */
-export function toEngineCard(card: ScryfallCard, commanderIds: ReadonlySet<string>): Omit<Card, "themes" | "roles"> {
+/**
+ * Converts a Scryfall card into the engine's Card, without tags. The build
+ * passes the RuleInput it already made, so the text is normalized once.
+ */
+export function toEngineCard(
+  card: ScryfallCard,
+  commanderIds: ReadonlySet<string>,
+  input: RuleInput = toRuleInput(card)
+): Omit<Card, "themes" | "roles"> {
   const legality = card.legalities["commander"] ?? "not_legal";
   return {
     oracleId: card.oracle_id ?? "",
@@ -45,7 +53,7 @@ export function toEngineCard(card: ScryfallCard, commanderIds: ReadonlySet<strin
     keywords: card.keywords ?? [],
     legality: (LEGALITY.has(legality) ? legality : "not_legal") as Card["legality"],
     canBeCommander: commanderIds.has(card.oracle_id ?? ""),
-    copyLimit: null, // RN-16: set by a role rule in M1
+    copyLimit: copyLimitOf(input),
     landValue: landValue(card)
   };
 }
