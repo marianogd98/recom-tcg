@@ -15,6 +15,15 @@ test("also replaces the short name of a legendary", () => {
   assert.equal(out, "~ costs {1} less to cast.");
 });
 
+test("current templating: 'this creature' and friends also become ~", () => {
+  const out = normalizeOracleText(
+    "Whenever this creature or another creature dies, target player loses 1 life and you gain 1 life.",
+    "Blood Artist"
+  );
+  assert.equal(out, "whenever ~ or another creature dies, target player loses 1 life and you gain 1 life.");
+  assert.equal(normalizeOracleText("Sacrifice this artifact: Draw a card.", "Mind Stone"), "sacrifice ~: draw a card.");
+});
+
 test("removes reminder text", () => {
   const out = normalizeOracleText("Flying (This creature can't be blocked except by creatures with flying or reach.)", "Bird");
   assert.equal(out, "flying");

@@ -1,8 +1,12 @@
 /**
  * Oracle text normalization applied before any rule runs (gramática YAML §3.2):
  * - lower case
- * - the card's own name becomes "~" (also its short name before the comma,
- *   e.g. "Karador" for "Karador, Ghost Chieftain")
+ * - every way a card refers to itself becomes "~":
+ *   - its name, and its short name before the comma ("Karador" for
+ *     "Karador, Ghost Chieftain"), as older Oracle text does;
+ *   - "this creature", "this artifact"… as Oracle text has done since
+ *     Wizards' 2025 templating update ("Whenever this creature or another
+ *     creature dies…" on Blood Artist);
  * - reminder text in parentheses is removed
  * - whitespace is collapsed per line
  *
@@ -14,6 +18,7 @@ export function normalizeOracleText(text: string, cardName: string): string {
   for (const name of names) {
     out = out.replace(new RegExp(escapeRegExp(name), "gi"), "~");
   }
+  out = out.replace(SELF_REFERENCE, "~");
   return out
     .toLowerCase()
     .split("\n")
@@ -21,6 +26,10 @@ export function normalizeOracleText(text: string, cardName: string): string {
     .filter((line) => line.length > 0)
     .join("\n");
 }
+
+/** "this <card type>": how current Oracle text names the card itself. */
+const SELF_REFERENCE =
+  /\bthis (?:creature|artifact|enchantment|land|planeswalker|battle|permanent|spell|card|token|vehicle|equipment|aura|saga|class|case|room|siege)\b/gi;
 
 /** Full name first so the short name never splits it. */
 function selfNames(cardName: string): string[] {
