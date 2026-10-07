@@ -60,6 +60,13 @@ flowchart TD
 5. **`tag-accumulator.ts`**: junta las etiquetas, quedándose con el peso máximo (nunca la suma).
 6. **`apply.ts`**: `tagCard()` orquesta los pasos 4 y 5 para una carta.
 
+Dos herramientas acompañan a quien escribe reglas, y ninguna toca el motor:
+
+- **`pnpm fixtures:sync`** (`cli/sync-fixtures.ts` + `scryfall/fixture.ts`): junta los nombres de todos los `examples`, los busca en los datos descargados y reescribe `fixtures/cards.json` con solo los campos que leen las reglas. Así los tests usan el texto Oracle real y siguen corriendo sin red.
+- **`pnpm rules:report [prefijo]`** (`cli/rules-report.ts` + `rules/coverage.ts`): aplica cada regla al pool de Commander completo y muestra cuántas cartas etiqueta, con muestras. `measureCoverage()` es una función pura (recibe cartas y reglas, devuelve números), por eso tiene su propio test y el CLI solo imprime.
+
+Los ejemplos miden la *exhaustividad* de una regla (¿atrapa lo que esperaba?); el reporte mide su *precisión* (¿qué más atrapa?). Hacen falta las dos.
+
 ## 4. La señal semántica (embeddings)
 
 Las reglas YAML son precisas pero solo detectan lo que alguien escribió. La señal semántica cubre el resto (RN-25): mide qué tan parecido es el texto de dos cartas, aunque usen palabras distintas.
@@ -127,7 +134,7 @@ En M3 el flujo será: la página descarga `data/out/cards.json` una vez por vers
 
 | Quiero… | Tengo que… |
 |---|---|
-| Detectar una mecánica nueva | Agregar una regla en `rules/themes/` o `rules/roles/` con sus `examples`, y las cartas de ejemplo en `packages/pipeline/fixtures/cards.json`. |
+| Detectar una mecánica nueva | Agregar una regla en `rules/themes/` o `rules/roles/` con sus `examples`, correr `pnpm fixtures:sync` para traer las cartas de ejemplo y revisar la precisión con `pnpm rules:report <prefijo>`. |
 | Un operador nuevo en `match:` | Una entrada en `conditions.ts` y la propiedad en `rule-file.schema.json`. |
 | Un chequeo nuevo del validador | Un objeto `SemanticCheck` en `semantic-checks.ts`, agregado a `SEMANTIC_CHECKS`, con su test. |
 | Un tipo nuevo de archivo YAML | Su `.schema.json` y una ruta en `SCHEMA_ROUTES`. |
