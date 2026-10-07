@@ -20,9 +20,10 @@ const token: ScryfallCard = {
 };
 
 test("skips objects that are not deck cards (RN-18)", () => {
-  const result = buildCardData({ rawCards: [...fixtures, token], commanderIds: new Set(), rules });
+  const memorabilia: ScryfallCard = { ...token, oracle_id: "fixture-front", layout: "front_card" };
+  const result = buildCardData({ rawCards: [...fixtures, token, memorabilia], commanderIds: new Set(), rules });
   assert.equal(result.cards.length, fixtures.length);
-  assert.equal(result.skipped, 1);
+  assert.equal(result.skipped, 2);
 });
 
 test("marks commander-eligible cards from the is:commander list (RN-01)", () => {
