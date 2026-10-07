@@ -48,6 +48,24 @@ test("identifies itself with User-Agent and Accept headers", async () => {
   assert.ok(requests[0]?.headers["Accept"]?.startsWith("application/json"));
 });
 
+test("reads download_uri from the item endpoint when the list omits it", async () => {
+  const itemUri = `${ScryfallClient.API_URL}/bulk-data/oracle-id`;
+  const { fetchFn } = fakeScryfall({
+    [`${ScryfallClient.API_URL}/bulk-data`]: { data: [{ type: "oracle_cards", uri: itemUri, updated_at: "2026-10-06T21:01:59Z" }] },
+    [itemUri]: { type: "oracle_cards", download_uri: "https://cdn/oracle.json", updated_at: "2026-10-06T21:01:59Z" }
+  });
+  const client = new ScryfallClient({ userAgent: "test", fetchFn, sleep: noWait });
+  assert.equal((await client.oracleBulkFile()).downloadUri, "https://cdn/oracle.json");
+});
+
+test("a bulk item without download_uri fails with the fields it did receive", async () => {
+  const { fetchFn } = fakeScryfall({
+    [`${ScryfallClient.API_URL}/bulk-data`]: { data: [{ type: "oracle_cards", updated_at: "2026-10-06T21:01:59Z", size: 1 }] }
+  });
+  const client = new ScryfallClient({ userAgent: "test", fetchFn, sleep: noWait });
+  await assert.rejects(client.oracleBulkFile(), /no download_uri.*Fields received: type, updated_at, size/);
+});
+
 test("HTTP errors stop the run with a clear message", async () => {
   const { fetchFn } = fakeScryfall({});
   const client = new ScryfallClient({ userAgent: "test", fetchFn, sleep: noWait });

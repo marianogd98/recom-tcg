@@ -23,8 +23,16 @@ export interface BulkFileInfo {
   updatedAt: string;
 }
 
+/** A bulk item as Scryfall documents it. Fields are optional here because we validate them. */
+interface BulkItem {
+  type: string;
+  uri?: string;
+  download_uri?: string;
+  updated_at?: string;
+}
+
 interface BulkList {
-  data: { type: string; download_uri: string; updated_at: string }[];
+  data: BulkItem[];
 }
 
 interface SearchPage {
@@ -51,8 +59,18 @@ export class ScryfallClient {
   /** The "oracle_cards" bulk file: one entry per card, not per printing (RN-10). */
   async oracleBulkFile(): Promise<BulkFileInfo> {
     const list = await this.getJson<BulkList>(`${ScryfallClient.API_URL}/bulk-data`);
-    const entry = list.data.find((bulk) => bulk.type === "oracle_cards");
-    if (!entry) throw new Error("Scryfall bulk-data has no oracle_cards entry");
+    const listed = list.data.find((bulk) => bulk.type === "oracle_cards");
+    if (!listed) throw new Error("Scryfall bulk-data has no oracle_cards entry");
+
+    // The list should already carry download_uri. If it does not, the item's
+    // own endpoint (`uri`) is the documented place to read it from.
+    const entry = listed.download_uri || !listed.uri ? listed : await this.getJson<BulkItem>(listed.uri);
+    if (!entry.download_uri || !entry.updated_at) {
+      throw new Error(
+        `Scryfall's oracle_cards bulk item has no download_uri/updated_at. ` +
+          `Fields received: ${Object.keys(entry).join(", ")}`
+      );
+    }
     return { downloadUri: entry.download_uri, updatedAt: entry.updated_at };
   }
 
