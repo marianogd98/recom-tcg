@@ -6,7 +6,7 @@
  * adding an object to SEMANTIC_CHECKS (Open/Closed); each one has a single
  * reason to change (Single Responsibility).
  */
-import { compilePattern, type RuleDefinition, type Vocabulary } from "../index.ts";
+import { compilePattern, parseTagSelector, type OverrideDefinition, type RuleDefinition, type Vocabulary } from "../index.ts";
 import type { Problem } from "./problem.ts";
 
 export interface RuleFileDocument {
@@ -17,7 +17,11 @@ export interface RuleFileDocument {
 export interface SemanticContext {
   vocabulary: Vocabulary;
   ruleFiles: RuleFileDocument[];
+  /** From rules/overrides.yaml; empty when the file has none. */
+  overrides: OverrideDefinition[];
 }
+
+export const OVERRIDES_FILE = "rules/overrides.yaml";
 
 export interface SemanticCheck {
   readonly name: string;
@@ -93,9 +97,60 @@ export const captureGroupsPresent: SemanticCheck = {
   }
 };
 
+/**
+ * An override can only use the closed vocabulary, like a rule. A captured
+ * value ("tribal:elf") only makes sense on a parameterized theme.
+ */
+export const overridesUseVocabulary: SemanticCheck = {
+  name: "overrides use themes and roles from vocabulary.yaml",
+  run({ vocabulary, overrides }) {
+    const themes = new Map(vocabulary.themes.map((theme) => [theme.id, theme.parameterized === true]));
+    const roles = new Set(vocabulary.roles.map((role) => role.id));
+    const problem = (card: string, message: string): Problem => ({ file: OVERRIDES_FILE, message: `"${card}": ${message}` });
+
+    return overrides.flatMap(({ card, add = [], remove = [] }) => {
+      const problems: Problem[] = [];
+      for (const tag of add) {
+        if ("role" in tag) {
+          if (!roles.has(tag.role)) problems.push(problem(card, `adds unknown role "${tag.role}"`));
+          continue;
+        }
+        const [base = "", param] = tag.theme.split(":");
+        if (!themes.has(base)) problems.push(problem(card, `adds unknown theme "${base}"`));
+        else if (param && !themes.get(base)) problems.push(problem(card, `theme "${base}" is not parameterized, so "${tag.theme}" is invalid`));
+      }
+      for (const entry of remove) {
+        const { base, param, provides } = parseTagSelector(entry);
+        const isTheme = themes.has(base);
+        if (!isTheme && !roles.has(base)) problems.push(problem(card, `removes "${entry}", which is neither a theme nor a role`));
+        else if (!isTheme && (param || provides)) problems.push(problem(card, `"${entry}": roles have no captured value or direction`));
+        else if (param && !themes.get(base)) problems.push(problem(card, `theme "${base}" is not parameterized, so "${entry}" is invalid`));
+      }
+      return problems;
+    });
+  }
+};
+
+/** Two entries for the same card would make the result depend on their order. */
+export const uniqueOverrideCards: SemanticCheck = {
+  name: "one override per card",
+  run({ overrides }) {
+    const seen = new Set<string>();
+    return overrides.flatMap(({ card }) => {
+      if (!seen.has(card)) {
+        seen.add(card);
+        return [];
+      }
+      return [{ file: OVERRIDES_FILE, message: `"${card}" has more than one override; merge them into one entry` }];
+    });
+  }
+};
+
 export const SEMANTIC_CHECKS: readonly SemanticCheck[] = [
   uniqueRuleIds,
   knownVocabulary,
   compilablePatterns,
-  captureGroupsPresent
+  captureGroupsPresent,
+  overridesUseVocabulary,
+  uniqueOverrideCards
 ];
