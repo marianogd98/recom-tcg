@@ -32,7 +32,7 @@ rules/                  Detection rules (themes, roles), vocabulary, overrides, 
 model.yaml              Every model threshold and weight
 import-profiles/        CSV column mappings for collection apps
 i18n/                   Explanation templates per language
-docs/                   Specification (business rules RN-01 … RN-65)
+docs/                   Specification (RN-01 … RN-65) and architecture guide
 ```
 
 ## Getting started
@@ -47,6 +47,10 @@ pnpm dev              # web app on http://localhost:3000
 pnpm data:fetch       # download Scryfall data into data/raw/
 pnpm data:build       # build tagged card data into data/out/
 ```
+
+## Architecture
+
+How the pieces fit together, and the Clean Code and SOLID conventions the code follows: [`docs/arquitectura.md`](docs/arquitectura.md) (Spanish).
 
 ## Contributing
 
