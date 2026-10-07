@@ -5,6 +5,8 @@
 import { readYaml, repoPaths, type OverridesFile } from "@recom-tcg/rules-schema";
 import { buildCardData, createManifest } from "../build/build-card-data.ts";
 import { buildNameIndex } from "../build/build-name-index.ts";
+import { buildNonDeckNames } from "../build/build-non-deck-names.ts";
+import { loadImportProfiles } from "../import-profiles.ts";
 import { loadRules } from "../rules/load.ts";
 import { YamlRuleSource } from "../rules/rule-source.ts";
 import { ArtifactStore } from "../storage/artifact-store.ts";
@@ -15,7 +17,8 @@ const paths = repoPaths(import.meta.dirname);
 const raw = new RawDataStore(paths.rawData).load();
 const rules = loadRules(new YamlRuleSource(paths.rules));
 const { overrides } = readYaml<OverridesFile>(paths.overrides);
-const { version: modelVersion } = readYaml<{ version: string }>(paths.model);
+const model = readYaml<{ version: string }>(paths.model);
+const modelVersion = model.version;
 
 const result = buildCardData({ rawCards: raw.oracleCards, commanderIds: new Set(raw.commanderIds), rules, overrides });
 if (result.unknownOverrideCards.length > 0) {
@@ -32,6 +35,8 @@ for (const [lang, names] of Object.entries(raw.localizedNames)) {
   store.saveNameIndex(lang, index);
   localizedNames[lang] = Object.keys(index).length;
 }
+const nonDeckNames = buildNonDeckNames(raw.oracleCards);
+store.saveImportSupport(nonDeckNames, loadImportProfiles(paths.importProfiles), model);
 
 const manifest = createManifest(result, { updatedAt: raw.updatedAt, modelVersion, rulesCount: rules.length, localizedNames });
 store.save(result.cards, manifest);

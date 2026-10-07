@@ -13,7 +13,8 @@
     "theme_support",
     "confidence",
     "profiles",
-    "tiebreak"
+    "tiebreak",
+    "import"
   ],
   "additionalProperties": false,
   "properties": {
@@ -181,6 +182,32 @@
       "type": "object",
       "additionalProperties": {
         "type": "number"
+      }
+    },
+    "import": {
+      "type": "object",
+      "description": "Name resolution when importing a pool (RN-13).",
+      "required": ["fuzzy_max_distance", "fuzzy_max_ratio", "max_suggestions"],
+      "additionalProperties": false,
+      "properties": {
+        "fuzzy_max_distance": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "description": "Most edits (insert, delete, change, swap) between a typo and a real name."
+        },
+        "fuzzy_max_ratio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.5,
+          "description": "…and at most this share of the name's length."
+        },
+        "max_suggestions": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "description": "Candidates offered for an ambiguous line."
+        }
       }
     }
   }

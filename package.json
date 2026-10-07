@@ -18,6 +18,7 @@
     "data:build": "pnpm --filter @recom-tcg/pipeline data:build",
     "data:embed": "pnpm --filter @recom-tcg/pipeline data:embed",
     "rules:report": "pnpm --filter @recom-tcg/pipeline rules:report",
+    "pool:import": "pnpm --filter @recom-tcg/pipeline pool:import",
     "fixtures:sync": "pnpm --filter @recom-tcg/pipeline fixtures:sync",
     "check": "pnpm validate:rules && pnpm typecheck && pnpm test"
   },

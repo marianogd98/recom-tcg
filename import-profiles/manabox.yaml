@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=../packages/rules-schema/schemas/import-profile.schema.json
+# ManaBox collection export (Collection → ⋯ → Export → CSV). RN-14.
+# "Name" holds the English name even for cards in other languages.
+# "Scryfall ID" identifies a printing, not a card, so it is not used.
+schema_version: 1
+id: manabox
+detect:
+  header_contains: ["Name", "Set code", "Collector number", "Quantity", "Scryfall ID", "Rarity"]
+columns:
+  name: "Name"
+  quantity: "Quantity"
+  language: "Language"

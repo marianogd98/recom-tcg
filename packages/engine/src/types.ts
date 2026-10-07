@@ -64,15 +64,27 @@ export interface PoolEntry {
   quantity: number;
 }
 
-/** Result of resolving one imported line (RN-13). */
-export type ImportLineStatus = "recognized" | "corrected" | "ambiguous" | "unrecognized";
+/**
+ * Result of resolving one imported line (RN-13). "ignored" is a token,
+ * emblem or other object that is not a deck card (RN-18).
+ */
+export type ImportLineStatus = "recognized" | "corrected" | "ambiguous" | "unrecognized" | "ignored";
 
 export interface ImportLineResult {
   line: number;
   raw: string;
+  /** The name as read from the line, before resolving. */
+  name: string;
+  quantity: number;
   status: ImportLineStatus;
+  /** The card, for recognized and corrected lines, and ambiguous ones the user already chose. */
   oracleId?: string;
+  /** Candidate oracle_ids for an ambiguous line. */
   suggestions?: string[];
+  /** For ignored lines: "token", "emblem"… */
+  ignoredKind?: string;
+  /** A resolved card that stays out of the pool (RN-19). */
+  excluded?: "banned" | "not_legal";
 }
 
 /** Priority profiles (RN-36). */

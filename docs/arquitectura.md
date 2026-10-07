@@ -111,6 +111,29 @@ Un jugador en Caracas exporta «Elfos de Llanowar», no «Llanowar Elves». Para
 
 `Card.copyLimit` dice cuántas copias admite un mazo: `1` casi siempre, `7` para Seven Dwarves, `"any"` para Relentless Rats y las tierras básicas (JSON no tiene `Infinity`). Lo lee `copy-limit.ts` de la frase que imprime el juego. Está en código y no en YAML porque es un conjunto cerrado de frases impresas, no una interpretación. `usableCopies()` del engine es el único lugar que decide cuántas copias usa el modelo (RN-15 a RN-17).
 
+### Importar el pool (bloque 2)
+
+Todo esto vive en `packages/engine/src/import/` porque corre en el navegador: la colección del usuario nunca sale de su equipo (RN-20).
+
+```mermaid
+flowchart LR
+  I["texto pegado<br/>o CSV"] --> D{"¿un perfil<br/>reconoce la cabecera?"}
+  D -->|sí| C["readCsvRows()"]
+  D -->|no| T["parseTextList()"]
+  C --> R["NameResolver"]
+  T --> R
+  R --> L["legalidad<br/>(RN-19)"]
+  L --> P["pool + reporte<br/>(RN-13)"]
+```
+
+1. **`csv.ts`**: lector de CSV propio, sin dependencias. Detecta el separador `;` que usa Excel configurado en español y quita el BOM.
+2. **`profiles.ts`**: elige el perfil de `import-profiles/` cuyas columnas están todas en la cabecera; si coinciden varios, gana el que comprueba más columnas, así el orden de los archivos no importa. Si el export trae `oracle_id` (Archidekt), la carta queda identificada sin leer el nombre.
+3. **`text-list.ts`**: lee listas como `4x Sol Ring (CMR) 263 *F*`, salta encabezados de sección («Commander», «Creatures (25)») y comentarios.
+4. **`name-resolver.ts`**: busca en inglés (nombre completo o cualquier cara), después en español, después entre tokens y emblemas (que se ignoran y solo se cuentan, RN-18) y, si nada coincide, por parecido. La distancia de edición (`edit-distance.ts`) cuenta una letra intercambiada como un solo error, porque así son las erratas al teclear. Un único candidato cercano queda «corregido»; varios, «ambiguo». Los umbrales viven en `model.yaml` → `import` (RN-23).
+5. **`import-pool.ts`**: une todo, aplica la legalidad (las prohibidas solo entran con «mesa casual») y suma las cantidades de varias impresiones de la misma carta (RN-10). Una línea ambigua queda fuera hasta que el usuario elige; la interfaz vuelve a llamar a `importPool()` con `choices`, así la función no guarda estado.
+
+`data:build` deja en `data/out/` lo que el importador necesita además de `cards.json`: `non-deck-names.json` (tokens, emblemas y cartas de arte), `import-profiles.json` y `model.json`. `pnpm pool:import <archivo>` ejecuta el mismo código del navegador sobre un archivo local e imprime el reporte; sirve para probar exports reales antes de que exista la web.
+
 ## 5. SOLID en este proyecto
 
 | Principio | Qué dice | Dónde se aplica |

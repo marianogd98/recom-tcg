@@ -10,6 +10,7 @@
     "data:build": "tsx src/cli/build-data.ts",
     "data:embed": "tsx src/cli/embed-data.ts",
     "rules:report": "tsx src/cli/rules-report.ts",
+    "pool:import": "tsx src/cli/import-pool.ts",
     "fixtures:sync": "tsx src/cli/sync-fixtures.ts",
     "test": "tsx --test \"src/**/*.test.ts\"",
     "typecheck": "tsc --noEmit -p tsconfig.json"
