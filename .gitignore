@@ -1,0 +1,19 @@
+node_modules/
+.pnpm-store/
+
+# Next.js
+apps/web/.next/
+apps/web/out/
+apps/web/next-env.d.ts
+
+# Data pipeline: raw downloads and generated artifacts are rebuilt by CI
+data/raw/
+data/out/
+
+# Misc
+*.log
+.DS_Store
+.env*
+!.env.example
+coverage/
+*.tsbuildinfo

@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=../../../packages/rules-schema/schemas/format.schema.json
+# Format profile (RN-51). The engine knows nothing about Commander beyond this file
+# and the commander module enabled by has_commander.
+schema_version: 1
+id: commander
+legality_key: commander
+deck_size: 100
+copies_limit: 1
+has_commander: true
+lands: { formula: commander_v0, min: 33, max: 40 }
+skeleton: skeleton.yaml
+pairing: pairing.yaml

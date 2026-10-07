@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=../../../packages/rules-schema/schemas/pairing.schema.json
+# Commander pair variants (RN-04). Each variant only pairs with itself.
+# TODO before publishing: check every entry against the current official Commander rules.
+schema_version: 1
+
+pairings:
+  - id: partner
+    a: { keyword: "Partner" }
+    b: { keyword: "Partner" }
+
+  - id: partner-with
+    a: { keyword_pattern: "Partner with (?<name>.+)" }
+    b: { name_equals: "{name}" }
+
+  - id: friends-forever
+    a: { keyword: "Friends forever" }
+    b: { keyword: "Friends forever" }
+
+  - id: choose-a-background
+    a: { keyword: "Choose a Background" }
+    b: { type_all: ["Legendary", "Enchantment", "Background"] }
+
+  - id: doctors-companion
+    a: { keyword: "Doctor's companion" }
+    b: { type_all: ["Legendary", "Creature", "Time Lord", "Doctor"] }

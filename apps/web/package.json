@@ -1,0 +1,24 @@
+{
+  "name": "@recom-tcg/web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ReCom TCG web app: Next.js static export. All scoring runs in the browser (RN-20).",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "npx serve out",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@recom-tcg/engine": "workspace:*",
+    "next": "^16.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "typescript": "^5.9.0"
+  }
+}

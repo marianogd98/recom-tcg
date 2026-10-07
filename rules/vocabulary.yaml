@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=../packages/rules-schema/schemas/vocabulary.schema.json
+# Closed list of themes, roles and regex macros (gramática YAML §3.3, §3.5).
+# Propose a new theme here first, in its own pull request.
+schema_version: 1
+
+themes:
+  - id: sacrifice
+    description: Sacrificing permanents, or caring when creatures die.
+  - id: tokens
+    description: Creating tokens, or caring about having many of them.
+  - id: counters
+    description: +1/+1 counters.
+  - id: graveyard
+    description: Using the graveyard as a resource; recursion.
+  - id: artifacts
+    description: Artifacts matter.
+  - id: enchantments
+    description: Enchantments matter.
+  - id: spellslinger
+    description: Casting instants and sorceries.
+  - id: lifegain
+    description: Gaining life, or caring about it.
+  - id: voltron
+    description: Equipment and auras on one threat.
+  - id: tribal
+    description: Creature types. Rules capture the type, producing tags such as tribal:elf.
+    parameterized: true
+
+roles:
+  - id: ramp
+  - id: draw
+  - id: removal_creature
+  - id: removal_artifact_enchantment
+  - id: counterspell
+  - id: wipe
+  - id: graveyard_hate
+  - id: protection
+  - id: fixing
+  - id: land
+
+macros:
+  N: "(?:a|an|one|two|three|four|five|x|\\d+)"
+  permanent_type: "(?:creature|artifact|enchantment|land|planeswalker)s?"

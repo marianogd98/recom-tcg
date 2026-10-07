@@ -1,0 +1,23 @@
+{
+  "name": "@recom-tcg/pipeline",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Build-time data pipeline: Scryfall bulk data → normalized, tagged, versioned artifacts for the browser.",
+  "type": "module",
+  "scripts": {
+    "data:fetch": "tsx src/scryfall/fetch.ts",
+    "data:build": "tsx src/build-data.ts",
+    "test": "tsx --test \"src/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@recom-tcg/engine": "workspace:*",
+    "@recom-tcg/rules-schema": "workspace:*",
+    "yaml": "^2.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}

@@ -1,0 +1,59 @@
+/* Design tokens from the v1 sketches. */
+:root {
+  --ground: #f5f6f8;
+  --surface: #ffffff;
+  --ink: #15171c;
+  --ink-muted: #4a505b;
+  --line: #dde0e6;
+  --accent: #0b6b6b;
+  --accent-soft: #e3f1f0;
+  --warn-ink: #8a4b0f;
+  --warn-soft: #fbefd9;
+  --bad-ink: #9b2c2c;
+  --bad-soft: #fbe7e7;
+  --ok-ink: #1f6b3a;
+  --ok-soft: #e3f3e8;
+
+  /* Mana pips always carry their letter: color never travels alone. */
+  --pip-w: #f3ebcb;
+  --pip-u: #2f6fb0;
+  --pip-b: #2a2a2e;
+  --pip-r: #c0412b;
+  --pip-g: #2e7d4f;
+  --pip-c: #d5d8de;
+
+  --radius: 12px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+h1, h2, h3 { font-family: var(--font-display), system-ui, sans-serif; line-height: 1.15; }
+
+a { color: var(--accent); }
+a:hover { color: #084f4f; }
+
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+.mono { font-family: var(--font-mono), ui-monospace, monospace; }
+
+.pip {
+  width: 22px; height: 22px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font: 600 11px var(--font-mono), monospace;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.15);
+}
+.pip-W { background: var(--pip-w); color: #3a3320; }
+.pip-U { background: var(--pip-u); color: #fff; }
+.pip-B { background: var(--pip-b); color: #fff; }
+.pip-R { background: var(--pip-r); color: #fff; }
+.pip-G { background: var(--pip-g); color: #fff; }

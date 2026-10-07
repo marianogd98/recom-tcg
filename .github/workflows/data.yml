@@ -1,0 +1,31 @@
+name: Data build
+
+# Weekly rebuild of the card data from Scryfall (RN-21). Also runnable by hand.
+on:
+  schedule:
+    - cron: "17 6 * * 1" # Mondays 06:17 UTC
+  workflow_dispatch:
+
+jobs:
+  build-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      # Switch to --frozen-lockfile once pnpm-lock.yaml is committed.
+      - run: pnpm install
+      - run: pnpm validate:rules
+      - name: Download Scryfall data
+        run: pnpm data:fetch
+      - name: Build artifacts
+        run: pnpm data:build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: card-data
+          path: data/out/
+          retention-days: 14
+      # M1: publish data/out/ next to the web build and deploy.

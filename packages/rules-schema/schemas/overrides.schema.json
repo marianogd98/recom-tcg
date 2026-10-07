@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:recom-tcg:schema:overrides",
+  "title": "ReCom TCG overrides",
+  "type": "object",
+  "required": ["schema_version", "overrides"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": 1 },
+    "overrides": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["card", "reason"],
+        "anyOf": [{ "required": ["add"] }, { "required": ["remove"] }],
+        "additionalProperties": false,
+        "properties": {
+          "card": { "type": "string", "minLength": 1 },
+          "reason": { "type": "string", "minLength": 10 },
+          "add": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["weight"],
+              "additionalProperties": false,
+              "properties": {
+                "theme": { "type": "string" },
+                "role": { "type": "string" },
+                "provides": { "enum": ["asks", "gives"] },
+                "weight": { "type": "number", "minimum": 0.1, "maximum": 1 }
+              }
+            }
+          },
+          "remove": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

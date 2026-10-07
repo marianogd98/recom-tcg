@@ -1,0 +1,9 @@
+# Explanation templates (RN-53). The engine emits keys + params; the UI renders them.
+theme_support: "You have {count} {theme} cards that work with this commander."
+role_covered: "{role} covered: {have} of {target}."
+role_below_target: "{role}: {have} of {target}."
+missing_nonlands: "You need {count} more nonland cards to complete the deck."
+commander_off_curve: "This commander costs {mv}; your deck may struggle to cast it on time."
+theme_insufficient: "Only {count} cards support its main theme (score ×{multiplier})."
+open_plan: "We found no clear plan in its text: the score is based on the skeleton and usable cards."
+gap_detected: "You have {count} {theme} cards in {identity}, but none of your legendaries there uses them."

@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=../../packages/rules-schema/schemas/rule-file.schema.json
+schema_version: 1
+
+rules:
+  - id: ramp.mana-dork
+    role: ramp
+    weight: 1.0
+    match:
+      type_any: [Creature]
+      text_any:
+        - "\\{t\\}: add \\{[wubrgc]\\}"
+    examples:
+      match: [Llanowar Elves]
+      no_match: [Viscera Seer]
+
+  - id: ramp.land-search
+    role: ramp
+    weight: 1.0
+    match:
+      text_any:
+        - "search your library for (?:a|up to two) basic land cards?.{0,80}onto the battlefield"
+    examples:
+      match: [Sakura-Tribe Elder]
+      no_match: [Blood Artist]

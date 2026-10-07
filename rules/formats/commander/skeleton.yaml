@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=../../../packages/rules-schema/schemas/skeleton.schema.json
+# Deck skeleton targets (RN-29, RN-39, RN-40). v0 hypotheses: calibrate with reference pools.
+schema_version: 1
+
+roles:
+  ramp:    { target: 10, weight: 0.25 }
+  draw:    { target: 10, weight: 0.25 }
+  interaction:
+    weight: 0.35
+    total_target: 12
+    subroles:
+      removal_creature:             { target: 4 }
+      removal_artifact_enchantment: { target: 2 }
+      counterspell:                 { target: 0, counts_as_general: true }
+      wipe:                         { target: 2 }
+      graveyard_hate:               { target: 1 }
+      protection:                   { target: 2 }
+  fixing:  { target_by_colors: [0, 0, 3, 6, 6, 6], weight: 0.15 }   # index = number of colors
+
+theme_modifiers:
+  voltron:      { protection: 3, wipe: -1 }
+  spellslinger: { draw: 2, interaction_total: 2 }
+  graveyard:    { graveyard_hate: -1 }
+
+curve_buckets: ["0-1", "2", "3", "4", "5", "6+"]

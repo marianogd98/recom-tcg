@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../packages/rules-schema/schemas/overrides.schema.json
+# Card-by-card corrections. They only add or remove tags, never scores.
+# `reason` is mandatory and every override is reviewed in its pull request.
+schema_version: 1
+
+overrides: []
+# Example:
+#  - card: "Some Card Name"
+#    add:    [{ theme: sacrifice, provides: gives, weight: 0.8 }]
+#    remove: [counters]
+#    reason: "The counters rule matches a poison counter, not +1/+1"

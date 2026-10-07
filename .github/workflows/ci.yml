@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      # Switch to --frozen-lockfile once pnpm-lock.yaml is committed.
+      - run: pnpm install
+      - name: Validate YAML rules and config
+        run: pnpm validate:rules
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Tests (rule examples, engine, schemas)
+        run: pnpm test
+      - name: Build web (static export)
+        run: pnpm build
+
+  # RN-24: PRs that touch the model or the rules must show how rankings move.
+  # Enabled in M2, once the reference-pool suite exists.
+  # ranking-diff:
+  #   if: github.event_name == 'pull_request'
+  #   runs-on: ubuntu-latest
+  #   steps: …

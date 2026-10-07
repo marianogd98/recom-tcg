@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:recom-tcg:schema:pairing",
+  "title": "ReCom TCG commander pairings",
+  "type": "object",
+  "required": ["schema_version", "pairings"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": 1 },
+    "pairings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "a", "b"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "a": { "$ref": "#/definitions/side" },
+          "b": { "$ref": "#/definitions/side" }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "side": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "keyword": { "type": "string" },
+        "keyword_pattern": { "type": "string" },
+        "name_equals": { "type": "string" },
+        "type_all": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+      }
+    }
+  }
+}

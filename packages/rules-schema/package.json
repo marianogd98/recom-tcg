@@ -1,0 +1,25 @@
+{
+  "name": "@recom-tcg/rules-schema",
+  "version": "0.1.0",
+  "private": true,
+  "description": "JSON Schemas for every YAML file contributors edit, plus the validator CI runs.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schemas/*": "./schemas/*"
+  },
+  "scripts": {
+    "validate": "tsx src/validate.ts",
+    "test": "tsx --test \"src/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "ajv": "^8.17.0",
+    "yaml": "^2.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}

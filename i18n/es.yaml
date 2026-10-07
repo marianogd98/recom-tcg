@@ -1,0 +1,9 @@
+# Plantillas de explicación (RN-53). Mismas claves que en.yaml.
+theme_support: "Tienes {count} cartas de {theme} que funcionan con este comandante."
+role_covered: "{role} cubierto: {have} de {target}."
+role_below_target: "{role}: {have} de {target}."
+missing_nonlands: "Te faltan {count} cartas que no son tierra para completar el mazo."
+commander_off_curve: "Este comandante cuesta {mv}; a tu mazo puede costarle lanzarlo a tiempo."
+theme_insufficient: "Solo {count} cartas apoyan su tema principal (puntuación ×{multiplier})."
+open_plan: "No detectamos un plan claro en su texto: el puntaje se basa en el esqueleto y en las cartas aprovechables."
+gap_detected: "Tienes {count} cartas de {theme} en {identity}, pero ninguno de tus legendarios ahí las aprovecha."

@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:recom-tcg:schema:format",
+  "title": "ReCom TCG format profile",
+  "type": "object",
+  "required": ["schema_version", "id", "legality_key", "deck_size", "copies_limit", "has_commander", "lands", "skeleton"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "pattern": "^[a-z0-9_-]+$" },
+    "legality_key": { "type": "string" },
+    "deck_size": { "type": "integer", "minimum": 40 },
+    "copies_limit": { "type": "integer", "minimum": 1 },
+    "has_commander": { "type": "boolean" },
+    "sideboard": { "type": "integer", "minimum": 0 },
+    "lands": {
+      "type": "object",
+      "required": ["formula", "min", "max"],
+      "additionalProperties": false,
+      "properties": {
+        "formula": { "type": "string" },
+        "min": { "type": "integer" },
+        "max": { "type": "integer" }
+      }
+    },
+    "skeleton": { "type": "string" },
+    "pairing": { "type": "string" }
+  }
+}

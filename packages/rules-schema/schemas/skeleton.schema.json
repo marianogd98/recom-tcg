@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:recom-tcg:schema:skeleton",
+  "title": "ReCom TCG deck skeleton",
+  "type": "object",
+  "required": ["schema_version", "roles"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": 1 },
+    "roles": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["weight"],
+        "properties": {
+          "weight": { "type": "number", "minimum": 0, "maximum": 1 },
+          "target": { "type": "integer", "minimum": 0 },
+          "total_target": { "type": "integer", "minimum": 0 },
+          "target_by_colors": { "type": "array", "items": { "type": "integer", "minimum": 0 }, "minItems": 6, "maxItems": 6 },
+          "subroles": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "required": ["target"],
+              "additionalProperties": false,
+              "properties": {
+                "target": { "type": "integer", "minimum": 0 },
+                "counts_as_general": { "type": "boolean" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "theme_modifiers": {
+      "type": "object",
+      "additionalProperties": { "type": "object", "additionalProperties": { "type": "integer" } }
+    },
+    "curve_buckets": { "type": "array", "items": { "type": "string" } }
+  }
+}

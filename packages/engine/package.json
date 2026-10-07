@@ -1,0 +1,19 @@
+{
+  "name": "@recom-tcg/engine",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pure TypeScript scoring engine: pool normalization, candidates, metrics and evidence. No DOM, no network.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "tsx --test \"src/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}

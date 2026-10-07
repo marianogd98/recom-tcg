@@ -1,0 +1,25 @@
+{
+  "name": "recom-tcg",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Discover which commanders in your own card pool make the most of the rest of your collection.",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @recom-tcg/web dev",
+    "build": "pnpm --filter @recom-tcg/web build",
+    "test": "pnpm -r --if-present test",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "validate:rules": "pnpm --filter @recom-tcg/rules-schema validate",
+    "data:fetch": "pnpm --filter @recom-tcg/pipeline data:fetch",
+    "data:build": "pnpm --filter @recom-tcg/pipeline data:build",
+    "check": "pnpm validate:rules && pnpm typecheck && pnpm test"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}

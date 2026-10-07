@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:recom-tcg:schema:model",
+  "title": "ReCom TCG model parameters",
+  "type": "object",
+  "required": ["schema_version", "version", "synergy", "lands", "utility", "theme_support", "confidence", "profiles", "tiebreak"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": 1 },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "synergy": {
+      "type": "object",
+      "required": ["alpha_rules", "k", "semantic_calibration", "pair_affinity"],
+      "properties": {
+        "alpha_rules": { "type": "number", "minimum": 0, "maximum": 1 },
+        "k": { "type": "integer", "minimum": 1 },
+        "semantic_calibration": { "enum": ["percentile"] },
+        "pair_affinity": {
+          "type": "object",
+          "required": ["asks_gives", "same_direction"],
+          "properties": {
+            "asks_gives": { "type": "number", "minimum": 0, "maximum": 1 },
+            "same_direction": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        }
+      }
+    },
+    "lands": { "type": "object" },
+    "utility": {
+      "type": "object",
+      "required": ["useful_threshold"],
+      "properties": { "useful_threshold": { "type": "number", "minimum": 0, "maximum": 1 } }
+    },
+    "theme_support": {
+      "type": "object",
+      "required": ["min_cards", "floor_multiplier"],
+      "properties": {
+        "min_cards": { "type": "integer", "minimum": 1 },
+        "floor_multiplier": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "confidence": { "type": "object" },
+    "profiles": {
+      "type": "object",
+      "required": ["default"],
+      "additionalProperties": {
+        "type": "object",
+        "required": ["synergy", "skeleton", "utility"],
+        "additionalProperties": false,
+        "properties": {
+          "synergy": { "type": "number", "minimum": 0, "maximum": 1 },
+          "skeleton": { "type": "number", "minimum": 0, "maximum": 1 },
+          "utility": { "type": "number", "minimum": 0, "maximum": 1 }
+        }
+      }
+    },
+    "tiebreak": { "type": "array", "items": { "enum": ["synergy", "missing_asc", "name"] } },
+    "limits": { "type": "object", "additionalProperties": { "type": "number" } }
+  }
+}

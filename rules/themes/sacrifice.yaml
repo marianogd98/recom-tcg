@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=../../packages/rules-schema/schemas/rule-file.schema.json
+schema_version: 1
+
+rules:
+  - id: sacrifice.outlet
+    theme: sacrifice
+    provides: gives
+    weight: 1.0
+    match:
+      text_any:
+        - "sacrifice (?:a|another) (?:creature|permanent|artifact)(?: or (?:artifact|creature))?:"
+      text_none:
+        - "sacrifice ~:"
+    examples:
+      match: [Viscera Seer, Carrion Feeder]
+      no_match: [Llanowar Elves, Sakura-Tribe Elder]
+
+  - id: sacrifice.death-payoff
+    theme: sacrifice
+    provides: asks
+    weight: 1.0
+    match:
+      text_any:
+        - "whenever (?:~ or )?(?:a|another) (?:nontoken )?creature(?: you control)? dies"
+    examples:
+      match: [Blood Artist, Zulaport Cutthroat]
+      no_match: [Viscera Seer]

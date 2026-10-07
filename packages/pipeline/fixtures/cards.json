@@ -1,0 +1,81 @@
+[
+  {
+    "oracle_id": "fixture-viscera-seer",
+    "name": "Viscera Seer",
+    "layout": "normal",
+    "cmc": 1,
+    "type_line": "Creature — Vampire Wizard",
+    "oracle_text": "Sacrifice a creature: Scry 1.",
+    "color_identity": ["B"],
+    "keywords": [],
+    "legalities": { "commander": "legal" }
+  },
+  {
+    "oracle_id": "fixture-carrion-feeder",
+    "name": "Carrion Feeder",
+    "layout": "normal",
+    "cmc": 1,
+    "type_line": "Creature — Zombie",
+    "oracle_text": "Carrion Feeder can't block.\nSacrifice a creature: Put a +1/+1 counter on Carrion Feeder.",
+    "color_identity": ["B"],
+    "keywords": [],
+    "legalities": { "commander": "legal" }
+  },
+  {
+    "oracle_id": "fixture-blood-artist",
+    "name": "Blood Artist",
+    "layout": "normal",
+    "cmc": 2,
+    "type_line": "Creature — Vampire",
+    "oracle_text": "Whenever Blood Artist or another creature dies, target player loses 1 life and you gain 1 life.",
+    "color_identity": ["B"],
+    "keywords": [],
+    "legalities": { "commander": "legal" }
+  },
+  {
+    "oracle_id": "fixture-zulaport-cutthroat",
+    "name": "Zulaport Cutthroat",
+    "layout": "normal",
+    "cmc": 2,
+    "type_line": "Creature — Human Rogue Ally",
+    "oracle_text": "Whenever Zulaport Cutthroat or another creature you control dies, each opponent loses 1 life and you gain 1 life.",
+    "color_identity": ["B"],
+    "keywords": [],
+    "legalities": { "commander": "legal" }
+  },
+  {
+    "oracle_id": "fixture-llanowar-elves",
+    "name": "Llanowar Elves",
+    "layout": "normal",
+    "cmc": 1,
+    "type_line": "Creature — Elf Druid",
+    "oracle_text": "{T}: Add {G}.",
+    "color_identity": ["G"],
+    "keywords": [],
+    "produced_mana": ["G"],
+    "legalities": { "commander": "legal" }
+  },
+  {
+    "oracle_id": "fixture-sakura-tribe-elder",
+    "name": "Sakura-Tribe Elder",
+    "layout": "normal",
+    "cmc": 2,
+    "type_line": "Creature — Snake Shaman",
+    "oracle_text": "Sacrifice Sakura-Tribe Elder: Search your library for a basic land card, put that card onto the battlefield tapped, then shuffle.",
+    "color_identity": ["G"],
+    "keywords": [],
+    "legalities": { "commander": "legal" }
+  },
+  {
+    "oracle_id": "fixture-elvish-archdruid",
+    "name": "Elvish Archdruid",
+    "layout": "normal",
+    "cmc": 3,
+    "type_line": "Creature — Elf Druid",
+    "oracle_text": "Other Elf creatures you control get +1/+1.\n{T}: Add {G} for each Elf you control.",
+    "color_identity": ["G"],
+    "keywords": [],
+    "produced_mana": ["G"],
+    "legalities": { "commander": "legal" }
+  }
+]

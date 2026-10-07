@@ -1,0 +1,13 @@
+{
+  "yaml.schemas": {
+    "./packages/rules-schema/schemas/rule-file.schema.json": ["rules/themes/*.yaml", "rules/roles/*.yaml"],
+    "./packages/rules-schema/schemas/vocabulary.schema.json": ["rules/vocabulary.yaml"],
+    "./packages/rules-schema/schemas/overrides.schema.json": ["rules/overrides.yaml"],
+    "./packages/rules-schema/schemas/format.schema.json": ["rules/formats/*/format.yaml"],
+    "./packages/rules-schema/schemas/pairing.schema.json": ["rules/formats/*/pairing.yaml"],
+    "./packages/rules-schema/schemas/skeleton.schema.json": ["rules/formats/*/skeleton.yaml"],
+    "./packages/rules-schema/schemas/model.schema.json": ["model.yaml"],
+    "./packages/rules-schema/schemas/import-profile.schema.json": ["import-profiles/*.yaml"]
+  },
+  "typescript.tsdk": "node_modules/typescript/lib"
+}

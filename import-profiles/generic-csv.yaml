@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../packages/rules-schema/schemas/import-profile.schema.json
+# Import profile (RN-14). Add one file per collection app; detection picks the
+# first profile whose header columns are all present.
+schema_version: 1
+id: generic-csv
+detect:
+  header_contains: ["Name", "Quantity"]
+columns:
+  name: "Name"
+  quantity: "Quantity"
+  language: "Language"

@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=../../packages/rules-schema/schemas/rule-file.schema.json
+schema_version: 1
+
+rules:
+  - id: tribal.lord
+    theme: tribal
+    provides: asks
+    weight: 1.0
+    capture: creature_type
+    match:
+      text_any:
+        - "other (?<creature_type>\\w+) creatures(?: you control)? get"
+    examples:
+      match: [Elvish Archdruid]
+      no_match: [Llanowar Elves]
