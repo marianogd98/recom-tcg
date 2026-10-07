@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=../packages/rules-schema/schemas/import-profile.schema.json
+# Moxfield collection export (Collection → Export → CSV). RN-14.
+# The quantity column is "Count"; "Tradelist Count" is how many are for trade
+# and is ignored. Language is written out ("English", "Spanish").
+schema_version: 1
+id: moxfield
+detect:
+  header_contains: ["Count", "Tradelist Count", "Name", "Edition"]
+columns:
+  name: "Name"
+  quantity: "Count"
+  language: "Language"

@@ -9,3 +9,4 @@ export * from "./names.ts";
 export * from "./import/csv.ts";
 export * from "./import/text-list.ts";
 export * from "./import/imported-line.ts";
+export * from "./import/profiles.ts";

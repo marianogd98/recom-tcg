@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=../packages/rules-schema/schemas/import-profile.schema.json
+# Archidekt collection export (Collection → Export, with the "Oracle ID"
+# column checked). RN-14. The oracle_id identifies the card directly, so
+# even a misspelled or translated name is resolved. Without that column
+# the export still imports through generic-csv, by name.
+schema_version: 1
+id: archidekt
+detect:
+  header_contains: ["Quantity", "Name", "Oracle ID"]
+columns:
+  name: "Name"
+  quantity: "Quantity"
+  language: "Language"
+  oracle_id: "Oracle ID"

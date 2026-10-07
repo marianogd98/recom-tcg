@@ -1,6 +1,8 @@
 # yaml-language-server: $schema=../packages/rules-schema/schemas/import-profile.schema.json
-# Import profile (RN-14). Add one file per collection app; detection picks the
-# first profile whose header columns are all present.
+# Import profile (RN-14). Add one file per collection app. Detection keeps the
+# profiles whose header_contains columns are all present (without case) and
+# picks the one that lists the most, so this generic profile only applies
+# when no app-specific one matches.
 schema_version: 1
 id: generic-csv
 detect:
