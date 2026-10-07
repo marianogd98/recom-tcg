@@ -5,3 +5,4 @@ export * from "./semantic/vector.ts";
 export * from "./semantic/calibration.ts";
 export * from "./semantic/artifacts.ts";
 export * from "./copies.ts";
+export * from "./names.ts";
