@@ -27,12 +27,54 @@ test("follows every page of a search and de-duplicates ids", async () => {
   assert.deepEqual(await client.searchOracleIds("is:commander"), ["a", "b", "c"]);
 });
 
-test("waits between search requests, as Scryfall asks", async () => {
+test("waits 550 ms before each search page: Scryfall allows 2 per second there", async () => {
   const waits: number[] = [];
-  const { fetchFn } = fakeScryfall({ [SEARCH]: { data: [], has_more: false } });
+  const { fetchFn } = fakeScryfall({
+    [SEARCH]: { data: [], has_more: true, next_page: "page-2" },
+    "page-2": { data: [], has_more: false }
+  });
   const client = new ScryfallClient({ userAgent: "test", fetchFn, sleep: async (ms) => void waits.push(ms) });
   await client.searchOracleIds("is:commander");
-  assert.deepEqual(waits, [100]);
+  assert.deepEqual(waits, [550, 550]);
+});
+
+/** Answers 429 the first `times` requests, then delegates. */
+function rateLimitedFirst(times: number, then: FetchFn, headers: Record<string, string> = {}): FetchFn {
+  let left = times;
+  return async (url, init) => (left-- > 0 ? new Response("slow down", { status: 429, statusText: "Too Many Requests", headers }) : then(url, init));
+}
+
+test("a 429 waits out Scryfall's 30-second lockout and retries", async () => {
+  const waits: number[] = [];
+  const notices: number[] = [];
+  const { fetchFn } = fakeScryfall({ [SEARCH]: { data: [{ oracle_id: "a" }], has_more: false } });
+  const client = new ScryfallClient({
+    userAgent: "test",
+    fetchFn: rateLimitedFirst(1, fetchFn),
+    sleep: async (ms) => void waits.push(ms),
+    onRateLimited: (ms) => void notices.push(ms)
+  });
+  assert.deepEqual(await client.searchOracleIds("is:commander"), ["a"]);
+  assert.deepEqual(waits, [550, 31_000]);
+  assert.deepEqual(notices, [31_000]);
+});
+
+test("a Retry-After header, when sent, sets the wait", async () => {
+  const waits: number[] = [];
+  const { fetchFn } = fakeScryfall({ [SEARCH]: { data: [], has_more: false } });
+  const client = new ScryfallClient({
+    userAgent: "test",
+    fetchFn: rateLimitedFirst(1, fetchFn, { "Retry-After": "45" }),
+    sleep: async (ms) => void waits.push(ms)
+  });
+  await client.searchOracleIds("is:commander");
+  assert.deepEqual(waits, [550, 45_000]);
+});
+
+test("after two retries a 429 stops the run instead of insisting", async () => {
+  const { fetchFn } = fakeScryfall({ [SEARCH]: { data: [], has_more: false } });
+  const client = new ScryfallClient({ userAgent: "test", fetchFn: rateLimitedFirst(3, fetchFn), sleep: noWait });
+  await assert.rejects(client.searchOracleIds("is:commander"), /429 Too Many Requests/);
 });
 
 test("identifies itself with User-Agent and Accept headers", async () => {

@@ -1,9 +1,11 @@
 /**
  * The only module that knows Scryfall's HTTP API.
  *
- * Scryfall asks API clients to send a User-Agent and an Accept header and to
- * wait 50–100 ms between requests: https://scryfall.com/docs/api
- * Bulk files are served from a CDN and are not rate limited.
+ * Scryfall asks API clients to send a User-Agent and an Accept header, and
+ * enforces hard rate limits (https://scryfall.com/docs/api/rate-limits):
+ * 2 requests per second on /cards/search, 10 on other endpoints. A 429
+ * answer locks the client out for 30 seconds, and ignoring 429s can get an
+ * application banned. Bulk files come from a CDN and are not limited.
  *
  * `fetch` and `sleep` are injected (Dependency Inversion), so tests run the
  * real pagination logic against a fake server, instantly and offline.
@@ -18,8 +20,15 @@ export interface ScryfallClientOptions {
   userAgent: string;
   fetchFn?: FetchFn;
   sleep?: (ms: number) => Promise<void>;
-  requestDelayMs?: number;
+  /** Pause before each search page. Default 550 ms: under Scryfall's 2 per second, with margin. */
+  searchDelayMs?: number;
+  /** Called before waiting out a 429, so the CLI can say why it is paused. */
+  onRateLimited?: (waitMs: number) => void;
 }
+
+/** Scryfall locks a client out for 30 s after a 429; waiting a bit longer is the polite retry. */
+const RATE_LIMIT_WAIT_MS = 31_000;
+const MAX_RATE_LIMIT_RETRIES = 2;
 
 export interface BulkFileInfo {
   downloadUri: string;
@@ -56,13 +65,15 @@ export class ScryfallClient {
 
   private readonly fetchFn: FetchFn;
   private readonly sleep: (ms: number) => Promise<void>;
-  private readonly requestDelayMs: number;
+  private readonly searchDelayMs: number;
+  private readonly onRateLimited: (waitMs: number) => void;
   private readonly headers: Record<string, string>;
 
   constructor(options: ScryfallClientOptions) {
     this.fetchFn = options.fetchFn ?? fetch;
     this.sleep = options.sleep ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
-    this.requestDelayMs = options.requestDelayMs ?? 100;
+    this.searchDelayMs = options.searchDelayMs ?? 550;
+    this.onRateLimited = options.onRateLimited ?? (() => {});
     this.headers = { "User-Agent": options.userAgent, Accept: "application/json;q=0.9,*/*;q=0.8" };
   }
 
@@ -88,6 +99,7 @@ export class ScryfallClient {
   /** Downloads a bulk file, already decompressed if it came as gzip. */
   async download(url: string): Promise<Uint8Array> {
     const response = await this.request(url);
+    if (!response.ok) throw new Error(`GET ${url} → ${response.status} ${response.statusText}`);
     return inflateIfGzip(new Uint8Array(await response.arrayBuffer()));
   }
 
@@ -115,8 +127,8 @@ export class ScryfallClient {
     let url: string | undefined = `${ScryfallClient.API_URL}/cards/search?${params.toString().replace(/\+/g, "%20")}`;
     const results: T[] = [];
     while (url) {
-      await this.sleep(this.requestDelayMs);
-      const response = await this.fetchFn(url, { headers: this.headers });
+      await this.sleep(this.searchDelayMs);
+      const response = await this.request(url);
       if (response.status === 404 && results.length === 0) return [];
       if (!response.ok) throw new Error(`GET ${url} → ${response.status} ${response.statusText}`);
       const page = (await response.json()) as SearchPage<T>;
@@ -127,13 +139,25 @@ export class ScryfallClient {
   }
 
   private async getJson<T>(url: string): Promise<T> {
-    return (await (await this.request(url)).json()) as T;
+    const response = await this.request(url);
+    if (!response.ok) throw new Error(`GET ${url} → ${response.status} ${response.statusText}`);
+    return (await response.json()) as T;
   }
 
-  private async request(url: string): Promise<Response> {
+  /**
+   * One GET. On 429 it waits out Scryfall's lockout (or the Retry-After it
+   * sends) and tries again, at most twice; the caller decides what any
+   * other status means.
+   */
+  private async request(url: string, attempt = 0): Promise<Response> {
     const response = await this.fetchFn(url, { headers: this.headers });
-    if (!response.ok) throw new Error(`GET ${url} → ${response.status} ${response.statusText}`);
-    return response;
+    if (response.status !== 429 || attempt >= MAX_RATE_LIMIT_RETRIES) return response;
+
+    const retryAfter = Number(response.headers.get("Retry-After"));
+    const waitMs = retryAfter > 0 ? retryAfter * 1000 : RATE_LIMIT_WAIT_MS;
+    this.onRateLimited(waitMs);
+    await this.sleep(waitMs);
+    return this.request(url, attempt + 1);
   }
 }
 

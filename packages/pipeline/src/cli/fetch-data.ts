@@ -15,7 +15,8 @@ const USER_AGENT = "ReComTCG/0.1 (+https://github.com/marianogd98/recom-tcg)";
 /**
  * Languages whose card lists the importer accepts (RN-11), as Scryfall
  * codes: es, fr, de, it, pt, ja, ko, ru, zhs, zht. Adding one is adding
- * its code here; each costs one paged search of a minute or two.
+ * its code here; each costs one paged search of two or three minutes,
+ * because Scryfall allows 2 search requests per second.
  */
 const NAME_INDEX_LANGUAGES = ["es"];
 
@@ -23,7 +24,10 @@ const NAME_INDEX_LANGUAGES = ["es"];
 const BANNED_COMMANDERS_QUERY = 'banned:commander (t:legendary t:creature OR o:"can be your commander")';
 
 async function main(): Promise<void> {
-  const scryfall = new ScryfallClient({ userAgent: USER_AGENT });
+  const scryfall = new ScryfallClient({
+    userAgent: USER_AGENT,
+    onRateLimited: (ms) => console.log(`  Scryfall asked us to slow down (429). Waiting ${Math.round(ms / 1000)} s before retrying…`)
+  });
   const store = new RawDataStore(repoPaths(import.meta.dirname).rawData);
 
   const bulk = await scryfall.oracleBulkFile();
@@ -40,7 +44,7 @@ async function main(): Promise<void> {
   store.saveCommanderIds(commanderIds);
 
   for (const lang of NAME_INDEX_LANGUAGES) {
-    console.log(`Fetching every printing in "${lang}" (paged search, ~1–2 min)…`);
+    console.log(`Fetching every printing in "${lang}" (paged search, ~2–3 min)…`);
     const names = localizedNames(await scryfall.localizedPrintings(lang));
     store.saveLocalizedNames(lang, names);
     console.log(`  ${names.length} ${lang} names`);
