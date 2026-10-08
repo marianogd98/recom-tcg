@@ -12,3 +12,4 @@ export * from "./import/imported-line.ts";
 export * from "./import/profiles.ts";
 export * from "./import/name-resolver.ts";
 export * from "./import/import-pool.ts";
+export * from "./candidates.ts";

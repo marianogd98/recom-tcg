@@ -46,6 +46,7 @@ test("not-legal cards are always out; banned ones unless the table is casual (RN
   const strict = importPool("Black Lotus\nSquirrel Farm\nLightning Bolt", context);
   assert.deepEqual(strict.pool.map((entry) => entry.oracleId), ["bolt"]);
   assert.deepEqual(strict.summary.excluded, { banned: 1, notLegal: 1 });
+  assert.deepEqual(strict.banned, ["lotus"]);
 
   const casual = importPool("Black Lotus\nSquirrel Farm", context, { casualTable: true });
   assert.deepEqual(casual.pool.map((entry) => entry.oracleId), ["lotus"]);

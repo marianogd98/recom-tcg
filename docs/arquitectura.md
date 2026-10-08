@@ -134,6 +134,30 @@ flowchart LR
 
 `data:build` deja en `data/out/` lo que el importador necesita además de `cards.json`: `non-deck-names.json` (tokens, emblemas y cartas de arte), `import-profiles.json` y `model.json`. `pnpm pool:import <archivo>` ejecuta el mismo código del navegador sobre un archivo local e imprime el reporte; sirve para probar exports reales antes de que exista la web.
 
+### Candidatos y parejas (bloque 1)
+
+**Quién puede ser comandante** sale de los datos: la búsqueda `is:commander` de Scryfall marca `canBeCommander`. Scryfall deja fuera a las prohibidas, así que `data:fetch` las añade con una segunda búsqueda: no pueden ser candidatas, pero RN-02 tiene que poder nombrarlas («tienes a Golos, pero está prohibido»).
+
+**Las parejas** se declaran en `rules/formats/commander/pairing.yaml`. Cada variante tiene dos lados; dos cartas forman pareja cuando una cumple el lado `a`, la otra el lado `b` y las dos dan la misma *clave*:
+
+| Variante | Lado `a` | Lado `b` | Clave |
+|---|---|---|---|
+| `partner` | línea «Partner» | línea «Partner» | ninguna |
+| `partner-with` | «Partner with Krav, the Unredeemed» | la carta llamada así | el nombre |
+| `partner-variant` | «Partner—Survivors» | «Partner—Survivors» | lo que va después de la raya |
+| `choose-a-background` | «Choose a Background» | un Background (`solo: false`) | ninguna |
+
+Los lados se comprueban sobre las líneas del texto Oracle y no sobre las palabras clave de Scryfall, porque Scryfall etiqueta todas las variantes como «Partner»: con palabras clave, Kratos («Partner—Father & son») se emparejaría con cualquier partner. Como el navegador no tiene el texto Oracle, `build/pairing-tags.ts` resuelve esto en el build y deja en cada carta su `pairing` (qué lado de qué variante cumple, y con qué clave).
+
+En el engine, `candidates.ts`:
+
+1. **`soloCandidates()`**: legales, aptas para comandante y sin `solo: false`. Los Backgrounds están en `is:commander` pero solo mandan en pareja.
+2. **`formPairs()`**: todas las parejas posibles entre las cartas dadas, con la identidad unida. Está separada porque RN-63 pide que el ranking forme parejas solo con sus M mejores candidatos: la llamará con esos.
+3. **`findCandidates()`**: une lo anterior, filtra por las identidades elegidas (RN-05, RN-06), agrega la nota de prohibidos (RN-02) y, si no hay nadie, propone las identidades más cercanas que sí tienen candidatos (RN-59).
+4. **`eligiblePool()`**: E(c), las cartas del pool que caben en la identidad del candidato, sin el propio comandante (RN-03, RN-08).
+
+`pnpm pool:candidates <archivo> [--identity BG] [--subsets]` muestra los candidatos de un pool local con el tamaño de su E(c).
+
 ## 5. SOLID en este proyecto
 
 | Principio | Qué dice | Dónde se aplica |

@@ -2,7 +2,7 @@
  * `pnpm data:build` — turns data/raw/ into the browser artifacts in data/out/.
  * Run `pnpm data:fetch` first.
  */
-import { readYaml, repoPaths, type OverridesFile } from "@recom-tcg/rules-schema";
+import { readYaml, repoPaths, type OverridesFile, type PairingFile } from "@recom-tcg/rules-schema";
 import { buildCardData, createManifest } from "../build/build-card-data.ts";
 import { buildNameIndex } from "../build/build-name-index.ts";
 import { buildNonDeckNames } from "../build/build-non-deck-names.ts";
@@ -17,10 +17,11 @@ const paths = repoPaths(import.meta.dirname);
 const raw = new RawDataStore(paths.rawData).load();
 const rules = loadRules(new YamlRuleSource(paths.rules));
 const { overrides } = readYaml<OverridesFile>(paths.overrides);
+const { pairings } = readYaml<PairingFile>(paths.pairing);
 const model = readYaml<{ version: string }>(paths.model);
 const modelVersion = model.version;
 
-const result = buildCardData({ rawCards: raw.oracleCards, commanderIds: new Set(raw.commanderIds), rules, overrides });
+const result = buildCardData({ rawCards: raw.oracleCards, commanderIds: new Set(raw.commanderIds), rules, overrides, pairings });
 if (result.unknownOverrideCards.length > 0) {
   console.error(
     `✗ rules/overrides.yaml names cards that do not exist (use the English Oracle name): ${result.unknownOverrideCards.join(", ")}`

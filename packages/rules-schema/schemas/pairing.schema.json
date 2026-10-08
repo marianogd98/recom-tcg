@@ -2,6 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "urn:recom-tcg:schema:pairing",
   "title": "ReCom TCG commander pairings",
+  "description": "Pair variants (RN-04). Two cards pair when one matches side a, the other side b, and both give the same key.",
   "type": "object",
   "required": ["schema_version", "pairings"],
   "additionalProperties": false,
@@ -24,13 +25,23 @@
   "definitions": {
     "side": {
       "type": "object",
-      "minProperties": 1,
       "additionalProperties": false,
+      "anyOf": [
+        { "required": ["text_line"] },
+        { "required": ["text_pattern"] },
+        { "required": ["type_all"] },
+        { "required": ["own_name"] }
+      ],
       "properties": {
-        "keyword": { "type": "string" },
-        "keyword_pattern": { "type": "string" },
-        "name_equals": { "type": "string" },
-        "type_all": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+        "text_line": { "type": "string", "description": "A line of Oracle text that says exactly this, without case." },
+        "text_pattern": {
+          "type": "string",
+          "pattern": "\\(\\?<key>",
+          "description": "A regex matched against each line of Oracle text; its (?<key>…) group is the pairing key."
+        },
+        "type_all": { "type": "array", "items": { "type": "string" }, "minItems": 1, "description": "Words the type line must all contain." },
+        "own_name": { "const": true, "description": "The key is the card's own name." },
+        "solo": { "const": false, "description": "Cards matched by this side cannot be commander alone." }
       }
     }
   }
